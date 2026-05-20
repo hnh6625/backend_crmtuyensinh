@@ -46,3 +46,6 @@ logging:
   level:
     com.yourcompany.crm: DEBUG
     org.springframework.batch: INFO
+
+  profiles:
+    active: dev   # tự động load application-dev.yml
