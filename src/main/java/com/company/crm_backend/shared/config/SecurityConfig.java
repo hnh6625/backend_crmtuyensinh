@@ -1,5 +1,6 @@
-package com.company.crm_backend.shared.security;
+package com.company.crm_backend.shared.config;
 
+import com.company.crm_backend.shared.security.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
