@@ -9,8 +9,8 @@ import org.springframework.util.StringUtils;
 public class UserSpecification {
 
     public static Specification<User> build(UserFilterRequest f) {
-        return Specification
-                .where(notDeleted())
+        return Specification.<User>unrestricted()
+                .and(notDeleted())
                 .and(byKeyword(f.getKeyword()))
                 .and(byRole(f.getRole()))
                 .and(byStatus(f.getStatus()));
@@ -27,7 +27,7 @@ public class UserSpecification {
             return cb.or(
                     cb.like(cb.lower(root.get("username")), like),
                     cb.like(cb.lower(root.get("fullName")), like),
-                    cb.like(cb.lower(root.get("email")),    like)
+                    cb.like(cb.lower(root.get("email")), like)
             );
         };
     }

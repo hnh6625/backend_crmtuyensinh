@@ -39,7 +39,7 @@ public class UserController {
                 ApiResponse.success(userService.getActiveConsultants()));
     }
 
-    // ── CRUD ─────────────────────────────────────────────────────────────
+    // CRUD
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Page<UserResponse>>> getList(

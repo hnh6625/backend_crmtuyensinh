@@ -6,16 +6,17 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-@Getter @Builder
+@Getter
+@Builder
 public class UserResponse {
-    private Long   userId;
+    private Long userId;
     private String username;
     private String email;
     private String fullName;
     private String phone;
     private String avatar;
     private String role;
-    private Long   roleId;
+    private Long roleId;
     private String status;
     private Boolean mustChangePassword;
     private LocalDateTime lastLoginAt;
