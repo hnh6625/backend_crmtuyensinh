@@ -15,9 +15,12 @@ public enum ErrorCode {
     TOKEN_EXPIRED(401, "Token đã hết hạn"),
 
     // User
-    USER_NOT_FOUND(404, "Không tìm thấy người dùng"),
-    USERNAME_EXISTED(409, "Tên đăng nhập đã tồn tại"),
-    EMAIL_EXISTED(409, "Email đã tồn tại"),
+    ACCOUNT_INACTIVE     (403, "Tài khoản đã bị vô hiệu hóa"),
+    USER_NOT_FOUND       (404, "Không tìm thấy người dùng"),
+    USERNAME_EXISTED     (409, "Tên đăng nhập đã tồn tại"),
+    EMAIL_EXISTED        (409, "Email đã tồn tại"),
+    ROLE_NOT_FOUND       (404, "Không tìm thấy role"),
+    PASSWORD_NOT_MATCH   (400, "Mật khẩu xác nhận không khớp"),
 
     // Lead
     LEAD_NOT_FOUND(404, "Không tìm thấy lead"),

@@ -46,7 +46,7 @@ public class User {
 
     @Column(name = "must_change_password")
     @Builder.Default
-    private boolean mustChangePassword = true;
+    private Boolean mustChangePassword = true;
 
     @Column(name = "failed_login_attempts")
     @Builder.Default
@@ -71,6 +71,9 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     public boolean isAccountLocked() {
         if(status == UserStatus.LOCKED) return true;
         return lockedUntil != null && lockedUntil.isAfter(LocalDateTime.now());
@@ -90,4 +93,5 @@ public class User {
         this.lastLoginAt = LocalDateTime.now();
         if (this.status == UserStatus.LOCKED) this.status = UserStatus.ACTIVE;
     }
+
 }

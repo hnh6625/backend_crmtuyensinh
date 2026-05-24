@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class UserSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "session_id")
     private Long sessionid;
 
     @Column(name = "user_id", nullable = false)

@@ -1,5 +1,6 @@
 package com.company.crm_backend.shared.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,11 +17,13 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.io.IOException;
 import java.util.List;
 
+// shared/config/SecurityConfig.java
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity   // cho phép dùng @PreAuthorize trên method
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -29,56 +32,51 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)      // REST API không cần CSRF
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s ->
-                        s.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // không dùng session
-
+                        s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Route công khai — không cần token
-                        .requestMatchers("/api/auth/").permitAll()
-                        .requestMatchers("/swagger-ui/", "/api-docs/**").permitAll()
-                        // Mọi route còn lại cần đăng nhập
-                        .anyRequest().authenticated()
-                )
-
-                // Thêm JWT filter vào trước filter kiểm tra username/password
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-
-                // Khi không có token hoặc token sai → trả JSON thay vì redirect
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll()
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthFilter,
+                        UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((req, res, e) -> {
-                            res.setContentType("application/json;charset=UTF-8");
-                            res.setStatus(401);
-                            res.getWriter().write("""
-                        {"code":401,"message":"Chưa đăng nhập hoặc token hết hạn","data":null}
-                    """);
-                        })
-                        .accessDeniedHandler((req, res, e) -> {
-                            res.setContentType("application/json;charset=UTF-8");
-                            res.setStatus(403);
-                            res.getWriter().write("""
-                        {"code":403,"message":"Không có quyền thực hiện thao tác này","data":null}
-                    """);
-                        })
-                );
+                        .authenticationEntryPoint((req, res, e) ->
+                                writeJson(res, 401, "Chưa đăng nhập hoặc token hết hạn"))
+                        .accessDeniedHandler((req, res, e) ->
+                                writeJson(res, 403, "Không có quyền thực hiện thao tác này")));
 
         return http.build();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();  // mã hóa password khi lưu DB
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173")); // Vue dev port
-        config.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+        CorsConfiguration cfg = new CorsConfiguration();
+        cfg.setAllowedOrigins(List.of(
+                "http://localhost:5173",   // Vue dev
+                "http://localhost:3000"
+        ));
+        cfg.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
+        cfg.setAllowedHeaders(List.of("*"));
+        cfg.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", config);
+        source.registerCorsConfiguration("/api/**", cfg);
         return source;
+    }
+
+    private void writeJson(HttpServletResponse res, int status, String msg)
+            throws IOException {
+        res.setContentType("application/json;charset=UTF-8");
+        res.setStatus(status);
+        res.getWriter().write(
+                "{\"code\":%d,\"message\":\"%s\",\"data\":null}"
+                        .formatted(status, msg));
     }
 }

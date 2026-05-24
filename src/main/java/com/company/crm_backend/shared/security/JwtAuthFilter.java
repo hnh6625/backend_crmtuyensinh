@@ -24,39 +24,37 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest  req,
+                                    HttpServletResponse res,
+                                    FilterChain         chain)
+            throws ServletException, IOException {
 
-        // 1. Lấy header Authorization
-        String authHeader = request.getHeader("Authorization");
+        String header = req.getHeader("Authorization");
 
-        // 2. Không có token → cho qua, SecurityConfig sẽ chặn nếu route cần auth
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            chain.doFilter(request, response);
+        if (header == null || !header.startsWith("Bearer ")) {
+            chain.doFilter(req, res);
             return;
         }
 
-        // 3. Có token → kiểm tra
-        String token = authHeader.substring(7); // bỏ "Bearer "
+        String token = header.substring(7);
 
         if (jwtUtil.isValid(token)) {
-            Long userId   = jwtUtil.extractUserId(token);
+            Long   userId = jwtUtil.extractUserId(token);
             String role   = jwtUtil.extractRole(token);
 
-            // 4. Đưa thông tin user vào SecurityContext — controller đọc qua @RequestAttribute
             UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(userId, null,
+                    new UsernamePasswordAuthenticationToken(
+                            userId, null,
                             List.of(new SimpleGrantedAuthority("ROLE_" + role)));
 
-            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            // 5. Gắn userId vào request attribute để controller đọc dễ
-            request.setAttribute("userId", userId);
-            request.setAttribute("userRole", role);
+            // Gắn vào request attribute để Controller đọc dễ
+            req.setAttribute("userId",   userId);
+            req.setAttribute("userRole", role);
         }
 
-        chain.doFilter(request, response);
+        chain.doFilter(req, res);
     }
 }
