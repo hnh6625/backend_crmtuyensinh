@@ -64,7 +64,7 @@ public class User {
     private UserStatus status=UserStatus.ACTIVE;
 
     @CreationTimestamp
-    @Column(name = "updated_at")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
