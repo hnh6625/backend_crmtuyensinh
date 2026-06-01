@@ -23,16 +23,27 @@ public enum ErrorCode {
     PASSWORD_NOT_MATCH   (400, "Mật khẩu xác nhận không khớp"),
 
     // Lead
-    LEAD_NOT_FOUND(404, "Không tìm thấy lead"),
-    PHONE_DUPLICATE(409, "Số điện thoại đã tồn tại trong hệ thống"),
-    LEAD_ALREADY_ENROLLED(409, "Lead này đã được nhập học"),
+    LEAD_NOT_FOUND          (404, "Không tìm thấy lead"),
+    LEAD_STATUS_NOT_FOUND   (404, "Không tìm thấy trạng thái lead"),
+    PHONE_DUPLICATE         (409, "Số điện thoại đã tồn tại trong hệ thống"),
 
     // Call
-    CALL_ATTEMPT_EXCEEDED(400, "Lead này đã được gọi đủ 3 lần"),
+    CALL_RESULT_NOT_FOUND   (404, "Không tìm thấy kết quả cuộc gọi"),
+    CALL_ATTEMPT_EXCEEDED   (400, "Lead này đã được gọi đủ 3 lần"),
+    FOLLOW_UP_NOT_FOUND     (404, "Không tìm thấy lịch hẹn"),
+    INVALID_STATUS_TRANSITION(400, "Không thể chuyển trạng thái này"),
 
-    // Import
-    IMPORT_PROCESSING(409, "File đang được xử lý, vui lòng đợi"),
-    INVALID_FILE_FORMAT(400, "File không đúng định dạng CSV"),
+    ENROLLMENT_NOT_FOUND       (404, "Không tìm thấy thông tin nhập học"),
+    LEAD_ALREADY_ENROLLED      (409, "Lead này đã được nhập học"),
+    MAJOR_NOT_FOUND            (404, "Không tìm thấy ngành học"),
+    CAMPUS_NOT_FOUND           (404, "Không tìm thấy cơ sở"),
+    SEMESTER_NOT_FOUND         (404, "Không tìm thấy học kỳ"),
+    SCHOLARSHIP_EXCEEDS_TUITION(400, "Học bổng không được lớn hơn học phí"),
+
+    //import
+    IMPORT_NOT_FOUND           (404, "Không tìm thấy import job"),
+    INVALID_FILE_FORMAT        (400, "File phải có định dạng .csv"),
+    FILE_TOO_LARGE             (400, "File không được vượt quá 50MB"),
 
     // Common
     VALIDATION_ERROR(400, "Dữ liệu không hợp lệ"),

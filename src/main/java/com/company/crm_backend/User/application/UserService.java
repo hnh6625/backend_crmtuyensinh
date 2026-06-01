@@ -1,6 +1,7 @@
 package com.company.crm_backend.User.application;
 
 import com.company.crm_backend.User.application.dto.*;
+import com.company.crm_backend.User.domain.RoleName;
 import com.company.crm_backend.User.domain.UserStatus;
 import com.company.crm_backend.shared.exception.AppException;
 import com.company.crm_backend.shared.exception.ErrorCode;
@@ -49,9 +50,11 @@ public class UserService {
     // Dropdown cho assign lead — chỉ CONSULTANT + COLLABORATOR còn hoạt động
     @Transactional(readOnly = true)
     public List<SimpleUserResponse> getActiveConsultants() {
-        return userRepository.findAllActiveUsers()
+        return userRepository
+                .findActiveByRoleNames(List.of(
+                        RoleName.CONSULTANT.name(),
+                        RoleName.COLLABORATOR.name()))
                 .stream()
-                .filter(u -> !u.getRole().getRoleName().equals("ADMIN"))
                 .map(SimpleUserResponse::from)
                 .toList();
     }
@@ -144,14 +147,14 @@ public class UserService {
 
     // Unlock
     public UserResponse unlock(Long userId) {
-        userRepository.findByUserIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        userRepository.unlockUser(userId);
+        user.setStatus(UserStatus.ACTIVE);
+        user.setFailedLoginAttempts(0);
+        user.setLockedUntil(null);
 
-        return userRepository.findByUserIdAndDeletedAtIsNull(userId)
-                .map(UserResponse::from)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return UserResponse.from(userRepository.save(user));
     }
 
     // Soft delete

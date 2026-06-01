@@ -94,4 +94,21 @@ public class User {
         if (this.status == UserStatus.LOCKED) this.status = UserStatus.ACTIVE;
     }
 
+    public boolean hasRole(RoleName roleName) {
+        return this.role != null
+                && this.role.getRoleName().equals(roleName.name());
+    }
+
+    public boolean isAdmin() {
+        return hasRole(RoleName.MANAGER);
+    }
+
+    public boolean isConsultant() {
+        return hasRole(RoleName.CONSULTANT);
+    }
+
+    public boolean isCollaborator() {
+        return hasRole(RoleName.COLLABORATOR);
+    }
+
 }

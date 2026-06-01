@@ -30,43 +30,34 @@ public class AuthService {
     private final UserRepository userRepository;
     private final UserSessionRepository sessionRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil               jwtUtil;
+    private final JwtUtil jwtUtil;
 
     @Value("${app.jwt.access-token-expiry}")
     private long accessExpiry;
 
     public LoginResponse login(LoginRequest req, HttpServletRequest httpReq) {
-        // 1. Tìm user
         User user = userRepository
                 .findByUsernameAndDeletedAtIsNull(req.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.INVALID_CREDENTIALS));
 
-        // 2. Kiểm tra tài khoản bị khóa
         if (user.isAccountLocked())
             throw new AppException(ErrorCode.ACCOUNT_LOCKED);
 
-        // 3. Kiểm tra tài khoản INACTIVE
         if (user.getStatus() == UserStatus.INACTIVE)
             throw new AppException(ErrorCode.ACCOUNT_INACTIVE);
 
-        // 4. Kiểm tra password
         if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
             user.incrementFailedAttempts();
             userRepository.save(user);
-            log.warn("Failed login for user={}, attempts={}",
-                    user.getUsername(), user.getFailedLoginAttempts());
             throw new AppException(ErrorCode.INVALID_CREDENTIALS);
         }
 
-        // 5. Login thành công — reset failed attempts
         user.resetLoginState();
         userRepository.save(user);
 
-        // 6. Tạo token
-        String accessToken  = jwtUtil.generateAccessToken(user);
+        String accessToken = jwtUtil.generateAccessToken(user);
         String refreshToken = jwtUtil.generateRefreshToken(user);
 
-        // 7. Revoke session cũ + lưu session mới
         sessionRepository.revokeAllByUserId(user.getUserId());
         sessionRepository.save(UserSession.builder()
                 .userId(user.getUserId())
@@ -74,11 +65,11 @@ public class AuthService {
                 .refreshToken(refreshToken)
                 .ipAddress(getClientIp(httpReq))
                 .userAgent(httpReq.getHeader("User-Agent"))
-                .expiredAt(LocalDateTime.now().plusSeconds(
-                        jwtUtil.getRefreshExpiry()))
+                .expiredAt(LocalDateTime.now().plusSeconds(jwtUtil.getRefreshExpiry()))
                 .build());
 
-        log.info("User {} logged in from {}", user.getUsername(), getClientIp(httpReq));
+        log.info("User {} ({}) logged in", user.getUsername(),
+                user.getRole().getRoleName());
 
         return LoginResponse.builder()
                 .accessToken(accessToken)
@@ -89,24 +80,22 @@ public class AuthService {
                 .build();
     }
 
-    // Refresh token
     public LoginResponse refresh(String refreshToken) {
-        // 1. Tìm session còn hiệu lực
         UserSession session = sessionRepository
                 .findByRefreshTokenAndIsRevokedFalse(refreshToken)
                 .orElseThrow(() -> new AppException(ErrorCode.TOKEN_INVALID));
 
-        // 2. Kiểm tra token chưa hết hạn
-        if (!jwtUtil.isValid(refreshToken))
+        if (!jwtUtil.isValid(refreshToken)) {
+            sessionRepository.delete(session);
+            sessionRepository.save(session);
             throw new AppException(ErrorCode.TOKEN_EXPIRED);
+        }
 
-        // 3. Lấy user
         User user = userRepository
                 .findByUserIdAndDeletedAtIsNull(session.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        // 4. Cấp token mới
-        String newAccess  = jwtUtil.generateAccessToken(user);
+        String newAccess = jwtUtil.generateAccessToken(user);
         String newRefresh = jwtUtil.generateRefreshToken(user);
 
         session.setAccessToken(newAccess);
@@ -123,15 +112,11 @@ public class AuthService {
                 .build();
     }
 
-    // Logout
     public void logout(Long userId) {
         sessionRepository.revokeAllByUserId(userId);
-        log.info("User {} logged out", userId);
     }
 
-    // Đổi mật khẩu
     public void changePassword(Long userId, ChangePasswordRequest req) {
-        // Validate confirm
         if (!req.getNewPassword().equals(req.getConfirmPassword()))
             throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
 
@@ -144,13 +129,9 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(req.getNewPassword()));
         user.setMustChangePassword(false);
         userRepository.save(user);
-
-        // Revoke tất cả session — bắt đăng nhập lại
         sessionRepository.revokeAllByUserId(userId);
-        log.info("User {} changed password", userId);
     }
 
-    //Lấy thông tin user hiện tại
     @Transactional(readOnly = true)
     public LoginResponse.UserInfo getMe(Long userId) {
         return userRepository.findByUserIdAndDeletedAtIsNull(userId)
@@ -158,7 +139,6 @@ public class AuthService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
-    // Helpers
     private String getClientIp(HttpServletRequest req) {
         String ip = req.getHeader("X-Forwarded-For");
         if (ip != null && !ip.isBlank()) return ip.split(",")[0].trim();

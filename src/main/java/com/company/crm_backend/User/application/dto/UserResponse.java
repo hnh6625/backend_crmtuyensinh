@@ -16,6 +16,7 @@ public class UserResponse {
     private String phone;
     private String avatar;
     private String role;
+    private String roleDisplayName;
     private Long roleId;
     private String status;
     private Boolean mustChangePassword;
@@ -32,6 +33,7 @@ public class UserResponse {
                 .phone(u.getPhone())
                 .avatar(u.getAvatar())
                 .role(u.getRole().getRoleName())
+                .roleDisplayName(u.getRole().getDisplayName())
                 .roleId(u.getRole().getRoleId())
                 .status(u.getStatus().name())
                 .mustChangePassword(u.getMustChangePassword())

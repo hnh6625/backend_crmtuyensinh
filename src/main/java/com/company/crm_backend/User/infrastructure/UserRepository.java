@@ -45,6 +45,14 @@ public interface UserRepository
         """)
     void unlockUser(@Param("userId") Long userId);
 
+    @Query("""
+        SELECT u FROM User u
+        WHERE u.deletedAt IS NULL
+          AND u.status = 'ACTIVE'
+          AND u.role.roleName IN :roleNames
+        """)
+    List<User> findActiveByRoleNames(@Param("roleNames") List<String> roleNames);
+
     // Tất cả user không bị xóa — cho dropdown assign lead
     @Query("SELECT u FROM User u WHERE u.deletedAt IS NULL AND u.status = 'ACTIVE'")
     List<User> findAllActiveUsers();

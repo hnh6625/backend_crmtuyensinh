@@ -2,6 +2,7 @@ package com.company.crm_backend.User.controller;
 
 import com.company.crm_backend.User.application.dto.*;
 import com.company.crm_backend.User.domain.Role;
+import com.company.crm_backend.User.domain.RoleName;
 import com.company.crm_backend.shared.response.ApiResponse;
 import com.company.crm_backend.User.application.UserService;
 import jakarta.validation.Valid;
@@ -26,22 +27,19 @@ public class UserController {
 
     private final UserService userService;
 
-    // Dropdown role
     @GetMapping("/roles")
     public ResponseEntity<ApiResponse<List<Role>>> getRoles() {
         return ResponseEntity.ok(ApiResponse.success(userService.getRoles()));
     }
 
-    // Dropdown consultant cho assign lead
     @GetMapping("/consultants")
     public ResponseEntity<ApiResponse<List<SimpleUserResponse>>> getConsultants() {
         return ResponseEntity.ok(
                 ApiResponse.success(userService.getActiveConsultants()));
     }
 
-    // CRUD
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<ApiResponse<Page<UserResponse>>> getList(
             @ModelAttribute UserFilterRequest filter,
             @PageableDefault(size = 20, sort = "createdAt",
@@ -57,7 +55,7 @@ public class UserController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<ApiResponse<UserResponse>> create(
             @Valid @RequestBody CreateUserRequest req) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -65,7 +63,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<ApiResponse<UserResponse>> update(
             @PathVariable Long id,
             @Valid @RequestBody UpdateUserRequest req) {
@@ -73,7 +71,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<ApiResponse<UserResponse>> updateStatus(
             @PathVariable Long id,
             @Valid @RequestBody UpdateStatusRequest req) {
@@ -82,20 +80,20 @@ public class UserController {
     }
 
     @PostMapping("/{id}/reset-password")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<ApiResponse<Void>> resetPassword(@PathVariable Long id) {
         userService.resetPassword(id);
         return ResponseEntity.ok(ApiResponse.success());
     }
 
     @PostMapping("/{id}/unlock")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<ApiResponse<UserResponse>> unlock(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(userService.unlock(id)));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         userService.delete(id);
         return ResponseEntity.ok(ApiResponse.success());
