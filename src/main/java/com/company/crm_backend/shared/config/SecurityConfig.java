@@ -1,6 +1,6 @@
 package com.company.crm_backend.shared.config;
 
-import com.company.crm_backend.User.domain.RoleName;
+import com.company.crm_backend.User.domain.RoleConstants;
 import com.company.crm_backend.shared.security.JwtAuthFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll()
 
                         .requestMatchers("/api/users/**")
-                        .hasRole(RoleName.MANAGER.name())
+                        .hasAuthority(RoleConstants.MANAGER)
 
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter,

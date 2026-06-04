@@ -30,11 +30,12 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
+
     public String generateAccessToken(User user) {
         return Jwts.builder()
                 .subject(String.valueOf(user.getUserId()))
                 .claim("username", user.getUsername())
-                .claim("role",     user.getRole().getRoleName())
+                .claim("role", user.getRole().getRoleName())
                 .claim("fullName", user.getFullName())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + accessExpiry * 1000))
@@ -66,7 +67,11 @@ public class JwtUtil {
     }
 
     public boolean isValid(String token) {
-        try { extractClaims(token); return true; }
-        catch (JwtException | IllegalArgumentException e) { return false; }
+        try {
+            extractClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 }

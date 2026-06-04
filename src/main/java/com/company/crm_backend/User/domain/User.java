@@ -94,21 +94,21 @@ public class User {
         if (this.status == UserStatus.LOCKED) this.status = UserStatus.ACTIVE;
     }
 
-    public boolean hasRole(RoleName roleName) {
+    public boolean hasRole(String roleNameConstant) {
         return this.role != null
-                && this.role.getRoleName().equals(roleName.name());
+                && this.role.getRoleName() != null
+                && this.role.getRoleName().equals(roleNameConstant);
     }
 
     public boolean isAdmin() {
-        return hasRole(RoleName.MANAGER);
+        return hasRole(RoleConstants.MANAGER);
     }
 
     public boolean isConsultant() {
-        return hasRole(RoleName.CONSULTANT);
+        return hasRole(RoleConstants.CONSULTANT);
     }
 
     public boolean isCollaborator() {
-        return hasRole(RoleName.COLLABORATOR);
+        return hasRole(RoleConstants.COLLABORATOR);
     }
-
 }

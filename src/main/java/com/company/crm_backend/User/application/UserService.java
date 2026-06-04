@@ -1,7 +1,7 @@
 package com.company.crm_backend.User.application;
 
 import com.company.crm_backend.User.application.dto.*;
-import com.company.crm_backend.User.domain.RoleName;
+import com.company.crm_backend.User.domain.RoleConstants;
 import com.company.crm_backend.User.domain.UserStatus;
 import com.company.crm_backend.shared.exception.AppException;
 import com.company.crm_backend.shared.exception.ErrorCode;
@@ -52,8 +52,8 @@ public class UserService {
     public List<SimpleUserResponse> getActiveConsultants() {
         return userRepository
                 .findActiveByRoleNames(List.of(
-                        RoleName.CONSULTANT.name(),
-                        RoleName.COLLABORATOR.name()))
+                        RoleConstants.CONSULTANT,
+                        RoleConstants.COLLABORATOR))
                 .stream()
                 .map(SimpleUserResponse::from)
                 .toList();
