@@ -54,30 +54,20 @@ public class LeadService {
     // Danh sách lead có filter + phân trang
     @Transactional(readOnly = true)
     public Page<LeadResponse> getList(LeadFilterRequest filter, Pageable pageable) {
-        return leadRepository
-                .findAll(LeadSpecification.build(filter), pageable)
-                .map(lead -> {
-                    // Query thêm danh sách tags cho từng lead trong danh sách
-                    List<String> tags = leadTagMapRepository
-                            .findAllByLead_LeadId(lead.getLeadId())
-                            .stream()
-                            .map(m -> m.getTag().getTagName())
-                            .toList();
+        return leadRepository.findAll(LeadSpecification.build(filter), pageable).map(lead -> {
+            // Query thêm danh sách tags cho từng lead trong danh sách
+            List<String> tags = leadTagMapRepository.findAllByLead_LeadId(lead.getLeadId()).stream().map(m -> m.getTag().getTagName()).toList();
 
-                    // Sử dụng hàm from(lead, tags)
-                    return LeadResponse.from(lead, tags);
-                });
+            // Sử dụng hàm from(lead, tags)
+            return LeadResponse.from(lead, tags);
+        });
     }
 
     // Chi tiết 1 lead kèm tags
     @Transactional(readOnly = true)
     public LeadResponse getById(Long leadId) {
         Lead lead = findOrThrow(leadId);
-        List<String> tags = leadTagMapRepository
-                .findAllByLead_LeadId(leadId)
-                .stream()
-                .map(m -> m.getTag().getTagName())
-                .toList();
+        List<String> tags = leadTagMapRepository.findAllByLead_LeadId(leadId).stream().map(m -> m.getTag().getTagName()).toList();
         return LeadResponse.from(lead, tags);
     }
 
@@ -93,23 +83,7 @@ public class LeadService {
         LeadStatus status = getStatusById(req.getStatusId());
         User assignedTo = getUserById(req.getAssignedTo());
 
-        Lead lead = Lead.builder()
-                .fullName(req.getFullName().trim())
-                .phone(req.getPhone().trim())
-                .phoneNormalized(normalized)
-                .email(req.getEmail())
-                .gender(req.getGender())
-                .birthDate(parseDate(req.getBirthDate()))
-                .schoolName(req.getSchoolName())
-                .graduationYear(req.getGraduationYear())
-                .address(req.getAddress())
-                .province(req.getProvince())
-                .note(req.getNote())
-                .source(source)
-                .status(status)
-                .assignedTo(assignedTo)
-                .createdBy(createdBy)
-                .build();
+        Lead lead = Lead.builder().fullName(req.getFullName().trim()).phone(req.getPhone().trim()).phoneNormalized(normalized).email(req.getEmail()).gender(req.getGender()).birthDate(parseDate(req.getBirthDate())).schoolName(req.getSchoolName()).graduationYear(req.getGraduationYear()).address(req.getAddress()).province(req.getProvince()).note(req.getNote()).source(source).status(status).assignedTo(assignedTo).createdBy(createdBy).build();
 
         leadRepository.save(lead);
 
@@ -119,8 +93,7 @@ public class LeadService {
             saveTags(lead, req.getTags());
         }
         // Ghi lịch sử
-        historyService.record(lead.getLeadId(), "CREATE",
-                null, lead.getFullName() + " - " + lead.getPhone(), createdBy);
+        historyService.record(lead.getLeadId(), "CREATE", null, lead.getFullName() + " - " + lead.getPhone(), createdBy);
 
         log.info("Lead created: id={}, phone={}", lead.getLeadId(), lead.getPhone());
         return LeadResponse.from(lead);
@@ -130,11 +103,13 @@ public class LeadService {
     public LeadResponse update(Long leadId, UpdateLeadRequest req, Long changedBy) {
         Lead lead = findOrThrow(leadId);
 
-        String oldStatus = lead.getStatus() != null
-                ? lead.getStatus().getStatusName() : null;
+        String oldStatus = lead.getStatus() != null ? lead.getStatus().getStatusName() : null;
 
-        if (StringUtils.hasText(req.getFullName()))
-            lead.setFullName(req.getFullName().trim());
+        if (StringUtils.hasText(req.getFullName())) lead.setFullName(req.getFullName().trim());
+        if (StringUtils.hasText(req.getPhone())) {
+            lead.setPhone(req.getPhone().trim());
+            lead.setPhoneNormalized(normalizePhone(req.getPhone()));
+        }
         if (req.getEmail() != null) lead.setEmail(req.getEmail());
         if (req.getGender() != null) lead.setGender(req.getGender());
         if (req.getBirthDate() != null) lead.setBirthDate(parseDate(req.getBirthDate()));
@@ -144,15 +119,12 @@ public class LeadService {
         if (req.getProvince() != null) lead.setProvince(req.getProvince());
         if (req.getNote() != null) lead.setNote(req.getNote());
 
-        if (req.getSourceId() != null)
-            lead.setSource(getSourceById(req.getSourceId()));
+        if (req.getSourceId() != null) lead.setSource(getSourceById(req.getSourceId()));
 
         if (req.getStatusId() != null) {
-            LeadStatus newStatus = leadStatusRepository.findById(req.getStatusId())
-                    .orElseThrow(() -> new AppException(ErrorCode.LEAD_STATUS_NOT_FOUND));
+            LeadStatus newStatus = leadStatusRepository.findById(req.getStatusId()).orElseThrow(() -> new AppException(ErrorCode.LEAD_STATUS_NOT_FOUND));
             lead.setStatus(newStatus);
-            historyService.record(leadId, "STATUS_CHANGE",
-                    oldStatus, newStatus.getStatusName(), changedBy);
+            historyService.record(leadId, "STATUS_CHANGE", oldStatus, newStatus.getStatusName(), changedBy);
         }
 
         // Cập nhật tags
@@ -170,27 +142,18 @@ public class LeadService {
     // Phân công lead cho nhân viên
     public LeadResponse assign(Long leadId, AssignLeadRequest req, Long assignedBy) {
         Lead lead = findOrThrow(leadId);
-        User newUser = userRepository.findById(req.getAssignToUserId())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        User assigner = userRepository.findById(assignedBy)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User newUser = userRepository.findById(req.getAssignToUserId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User assigner = userRepository.findById(assignedBy).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        String oldAssignee = lead.getAssignedTo() != null
-                ? lead.getAssignedTo().getFullName() : "Chưa có";
+        String oldAssignee = lead.getAssignedTo() != null ? lead.getAssignedTo().getFullName() : "Chưa có";
 
         lead.setAssignedTo(newUser);
         leadRepository.save(lead);
 
         // Lưu lịch sử phân công
-        assignmentRepository.save(LeadAssignment.builder()
-                .lead(lead)
-                .assignedTo(newUser)
-                .assignedBy(assigner)
-                .note(req.getNote())
-                .build());
+        assignmentRepository.save(LeadAssignment.builder().lead(lead).assignedTo(newUser).assignedBy(assigner).note(req.getNote()).build());
 
-        historyService.record(leadId, "ASSIGN",
-                oldAssignee, newUser.getFullName(), assignedBy);
+        historyService.record(leadId, "ASSIGN", oldAssignee, newUser.getFullName(), assignedBy);
 
         log.info("Lead {} assigned to {}", leadId, newUser.getUsername());
         return LeadResponse.from(lead);
@@ -213,31 +176,29 @@ public class LeadService {
 
     // Helpers
     private Lead findOrThrow(Long leadId) {
-        return leadRepository.findByLeadIdAndDeletedAtIsNull(leadId)
-                .orElseThrow(() -> new AppException(ErrorCode.LEAD_NOT_FOUND));
+        return leadRepository.findByLeadIdAndDeletedAtIsNull(leadId).orElseThrow(() -> new AppException(ErrorCode.LEAD_NOT_FOUND));
     }
 
-        // Ghi đè hàm saveTags cũ bằng hàm này:
-        private void saveTags(Lead lead, List<String> tagNames) {
-            for (String name : tagNames) {
-                String cleanName = name.trim();
-                if (cleanName.isEmpty()) continue;
+    // Ghi đè hàm saveTags cũ bằng hàm này:
+    private void saveTags(Lead lead, List<String> tagNames) {
+        for (String name : tagNames) {
+            String cleanName = name.trim();
+            if (cleanName.isEmpty()) continue;
 
-                // Tìm tag theo tên, nếu chưa có trong DB thì tạo mới luôn
-                LeadTag tag = leadTagRepository.findByTagName(cleanName)
-                        .orElseGet(() -> {
-                            LeadTag newTag = new LeadTag(); // Khởi tạo tùy theo cấu trúc entity của bạn
-                            newTag.setTagName(cleanName);
-                            return leadTagRepository.save(newTag);
-                        });
+            // Tìm tag theo tên, nếu chưa có trong DB thì tạo mới luôn
+            LeadTag tag = leadTagRepository.findByTagName(cleanName).orElseGet(() -> {
+                LeadTag newTag = new LeadTag(); // Khởi tạo tùy theo cấu trúc entity của bạn
+                newTag.setTagName(cleanName);
+                return leadTagRepository.save(newTag);
+            });
 
-                // Map tag với lead
-                LeadTagMap map = new LeadTagMap(); // Khởi tạo tùy theo entity LeadTagMap
-                map.setLead(lead);
-                map.setTag(tag);
-                leadTagMapRepository.save(map);
-            }
+            // Map tag với lead
+            LeadTagMap map = new LeadTagMap(); // Khởi tạo tùy theo entity LeadTagMap
+            map.setLead(lead);
+            map.setTag(tag);
+            leadTagMapRepository.save(map);
         }
+    }
 
     private LeadSource getSourceById(Long id) {
         return id == null ? null : leadSourceRepository.findById(id).orElse(null);
@@ -260,8 +221,7 @@ public class LeadService {
     private LocalDate parseDate(String dateStr) {
         if (!StringUtils.hasText(dateStr)) return null;
         try {
-            return LocalDate.parse(dateStr.trim(),
-                    DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            return LocalDate.parse(dateStr.trim(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         } catch (Exception e) {
             return null;
         }

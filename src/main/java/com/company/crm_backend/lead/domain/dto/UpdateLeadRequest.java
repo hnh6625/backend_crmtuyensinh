@@ -8,6 +8,7 @@ import java.util.List;
 @Getter
 public class UpdateLeadRequest {
     private String fullName;
+    private String phone;
     private String email;
     private Gender gender;
     private String birthDate;
