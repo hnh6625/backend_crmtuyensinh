@@ -32,5 +32,4 @@ public class CreateLeadRequest {
     private Long sourceId;
     private Long statusId;
     private Long assignedTo;
-    private List<Long> tagIds;
-}
+    private List<String> tags;}

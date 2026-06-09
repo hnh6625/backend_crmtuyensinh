@@ -104,9 +104,10 @@ public class LeadService {
         leadRepository.save(lead);
 
         // Gắn tags nếu có
-        if (req.getTagIds() != null && !req.getTagIds().isEmpty())
-            saveTags(lead, req.getTagIds());
 
+        if (req.getTags() != null && !req.getTags().isEmpty()) {
+            saveTags(lead, req.getTags());
+        }
         // Ghi lịch sử
         historyService.record(lead.getLeadId(), "CREATE",
                 null, lead.getFullName() + " - " + lead.getPhone(), createdBy);
@@ -115,7 +116,7 @@ public class LeadService {
         return LeadResponse.from(lead);
     }
 
-    // ── 5. Cập nhật thông tin lead ────────────────────────────────────────
+    // Cập nhật thông tin lead
     public LeadResponse update(Long leadId, UpdateLeadRequest req, Long changedBy) {
         Lead lead = findOrThrow(leadId);
 
@@ -145,15 +146,16 @@ public class LeadService {
         }
 
         // Cập nhật tags
-        if (req.getTagIds() != null) {
+        if (req.getTags() != null) {
             leadTagMapRepository.deleteAllByLeadId(leadId);
-            if (!req.getTagIds().isEmpty())
-                saveTags(lead, req.getTagIds());
+            if (!req.getTags().isEmpty()) {
+                saveTags(lead, req.getTags());
+            }
         }
-
         leadRepository.save(lead);
         return LeadResponse.from(lead);
     }
+
 
     // Phân công lead cho nhân viên
     public LeadResponse assign(Long leadId, AssignLeadRequest req, Long assignedBy) {
@@ -205,11 +207,27 @@ public class LeadService {
                 .orElseThrow(() -> new AppException(ErrorCode.LEAD_NOT_FOUND));
     }
 
-    private void saveTags(Lead lead, List<Long> tagIds) {
-        leadTagRepository.findAllByTagIdIn(tagIds)
-                .forEach(tag -> leadTagMapRepository.save(
-                        LeadTagMap.builder().lead(lead).tag(tag).build()));
-    }
+        // Ghi đè hàm saveTags cũ bằng hàm này:
+        private void saveTags(Lead lead, List<String> tagNames) {
+            for (String name : tagNames) {
+                String cleanName = name.trim();
+                if (cleanName.isEmpty()) continue;
+
+                // Tìm tag theo tên, nếu chưa có trong DB thì tạo mới luôn
+                LeadTag tag = leadTagRepository.findByTagName(cleanName)
+                        .orElseGet(() -> {
+                            LeadTag newTag = new LeadTag(); // Khởi tạo tùy theo cấu trúc entity của bạn
+                            newTag.setTagName(cleanName);
+                            return leadTagRepository.save(newTag);
+                        });
+
+                // Map tag với lead
+                LeadTagMap map = new LeadTagMap(); // Khởi tạo tùy theo entity LeadTagMap
+                map.setLead(lead);
+                map.setTag(tag);
+                leadTagMapRepository.save(map);
+            }
+        }
 
     private LeadSource getSourceById(Long id) {
         return id == null ? null : leadSourceRepository.findById(id).orElse(null);

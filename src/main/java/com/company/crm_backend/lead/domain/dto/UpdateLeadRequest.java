@@ -18,5 +18,4 @@ public class UpdateLeadRequest {
     private String note;
     private Long sourceId;
     private Long statusId;
-    private List<Long> tagIds;
-}
+    private List<String> tags;}
