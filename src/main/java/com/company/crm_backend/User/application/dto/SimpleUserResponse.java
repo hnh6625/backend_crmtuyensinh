@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class SimpleUserResponse {
-    private Long   userId;
+    private Long userId;
     private String fullName;
     private String username;
     private String role;

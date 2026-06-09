@@ -56,7 +56,17 @@ public class LeadService {
     public Page<LeadResponse> getList(LeadFilterRequest filter, Pageable pageable) {
         return leadRepository
                 .findAll(LeadSpecification.build(filter), pageable)
-                .map(LeadResponse::from);
+                .map(lead -> {
+                    // Query thêm danh sách tags cho từng lead trong danh sách
+                    List<String> tags = leadTagMapRepository
+                            .findAllByLead_LeadId(lead.getLeadId())
+                            .stream()
+                            .map(m -> m.getTag().getTagName())
+                            .toList();
+
+                    // Sử dụng hàm from(lead, tags)
+                    return LeadResponse.from(lead, tags);
+                });
     }
 
     // Chi tiết 1 lead kèm tags
