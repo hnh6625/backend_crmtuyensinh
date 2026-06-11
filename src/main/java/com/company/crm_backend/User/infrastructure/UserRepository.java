@@ -1,13 +1,14 @@
 package com.company.crm_backend.User.infrastructure;
 
 import com.company.crm_backend.User.domain.User;
-import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param; // sửa
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -57,3 +58,4 @@ public interface UserRepository
     @Query("SELECT u FROM User u WHERE u.deletedAt IS NULL AND u.status = 'ACTIVE'")
     List<User> findAllActiveUsers();
 }
+

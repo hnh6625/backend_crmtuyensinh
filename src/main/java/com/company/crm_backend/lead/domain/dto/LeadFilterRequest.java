@@ -15,4 +15,5 @@ public class LeadFilterRequest {
     private String province;     // lọc theo tỉnh thành
     private LocalDateTime createdFrom;
     private LocalDateTime createdTo;
+    private Long consultantId;
 }

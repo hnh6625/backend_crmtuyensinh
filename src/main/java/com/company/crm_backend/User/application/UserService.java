@@ -52,8 +52,8 @@ public class UserService {
     public List<SimpleUserResponse> getActiveConsultants() {
         return userRepository
                 .findActiveByRoleNames(List.of(
-                        RoleConstants.CONSULTANT,
-                        RoleConstants.COLLABORATOR))
+                        RoleConstants.CONSULTANT_RAW,
+                        RoleConstants.COLLABORATOR_RAW)) // thêm _RAW
                 .stream()
                 .map(SimpleUserResponse::from)
                 .toList();

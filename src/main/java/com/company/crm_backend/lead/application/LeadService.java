@@ -53,7 +53,10 @@ public class LeadService {
 
     // Danh sách lead có filter + phân trang
     @Transactional(readOnly = true)
-    public Page<LeadResponse> getList(LeadFilterRequest filter, Pageable pageable) {
+    public Page<LeadResponse> getList(LeadFilterRequest filter, Pageable pageable, Long userId, String userRole) {
+        // Nếu là CONSULTANT hoặc COLLABORATOR → chỉ xem lead của mình
+        if ("CONSULTANT".equals(userRole) || "COLLABORATOR".equals(userRole)) { // thêm
+            filter.setConsultantId(userId); }
         return leadRepository.findAll(LeadSpecification.build(filter), pageable).map(lead -> {
             // Query thêm danh sách tags cho từng lead trong danh sách
             List<String> tags = leadTagMapRepository.findAllByLead_LeadId(lead.getLeadId()).stream().map(m -> m.getTag().getTagName()).toList();

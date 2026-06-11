@@ -76,7 +76,7 @@ public class ImportBatchConfig {
                 .build();
     }
 
-    // TaskExecutor — 2 thread song song, an toàn 4 core/8GB
+    // TaskExecutor — 2 thread song song
     @Bean
     public TaskExecutor importTaskExecutor() {
         ThreadPoolTaskExecutor exec = new ThreadPoolTaskExecutor();

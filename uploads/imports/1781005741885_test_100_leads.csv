@@ -1,0 +1,101 @@
+Họ và tên,Số điện thoại,Email,Giới tính,Ngày sinh,Trường học,Năm tốt nghiệp,Tỉnh/Thành,Địa chỉ,Ghi chú,Nguồn
+Khách Hàng 1,0901000001,khach1@gmail.com,MALE,01/01/2005,THPT Lê Hồng Phong,2023,Hồ Chí Minh,Quận 1,Test dòng 1,Facebook
+Khách Hàng 2,0901000002,khach2@gmail.com,FEMALE,02/01/2005,THPT Chuyên Hà Nội,2024,Hà Nội,Đống Đa,Test dòng 2,Website
+Khách Hàng 3,0901000003,khach3@gmail.com,MALE,03/01/2005,THPT Gia Định,2023,Hồ Chí Minh,Bình Thạnh,Test dòng 3,Tiktok
+Khách Hàng 4,0901000004,khach4@gmail.com,FEMALE,04/01/2005,THPT Amsterdam,2024,Hà Nội,Cầu Giấy,Test dòng 4,Google
+Khách Hàng 5,0901000005,khach5@gmail.com,MALE,05/01/2005,THPT Nguyễn Thượng Hiền,2023,Hồ Chí Minh,Tân Bình,Test dòng 5,Facebook
+Khách Hàng 6,0901000006,khach6@gmail.com,FEMALE,06/01/2005,THPT Trần Đại Nghĩa,2024,Hồ Chí Minh,Quận 1,Test dòng 6,Website
+Khách Hàng 7,0901000007,khach7@gmail.com,MALE,07/01/2005,THPT Chu Văn An,2023,Hà Nội,Tây Hồ,Test dòng 7,Tiktok
+Khách Hàng 8,0901000008,khach8@gmail.com,FEMALE,08/01/2005,THPT Mạc Đĩnh Chi,2024,Hồ Chí Minh,Quận 6,Test dòng 8,Google
+Khách Hàng 9,0901000009,khach9@gmail.com,MALE,09/01/2005,THPT Kim Liên,2023,Hà Nội,Đống Đa,Test dòng 9,Facebook
+Khách Hàng 10,0901000010,khach10@gmail.com,FEMALE,10/01/2005,THPT Nguyễn Thị Minh Khai,2024,Hồ Chí Minh,Quận 3,Test dòng 10,Website
+Khách Hàng 11,0901000011,khach11@gmail.com,MALE,11/01/2005,THPT Lê Hồng Phong,2023,Hồ Chí Minh,Quận 1,Test dòng 11,Tiktok
+Khách Hàng 12,0901000012,khach12@gmail.com,FEMALE,12/01/2005,THPT Chuyên Hà Nội,2024,Hà Nội,Đống Đa,Test dòng 12,Google
+Khách Hàng 13,0901000013,khach13@gmail.com,MALE,13/01/2005,THPT Gia Định,2023,Hồ Chí Minh,Bình Thạnh,Test dòng 13,Facebook
+Khách Hàng 14,0901000014,khach14@gmail.com,FEMALE,14/01/2005,THPT Amsterdam,2024,Hà Nội,Cầu Giấy,Test dòng 14,Website
+Khách Hàng 15,0901000015,khach15@gmail.com,MALE,15/01/2005,THPT Nguyễn Thượng Hiền,2023,Hồ Chí Minh,Tân Bình,Test dòng 15,Tiktok
+Khách Hàng 16,0901000016,khach16@gmail.com,FEMALE,16/01/2005,THPT Trần Đại Nghĩa,2024,Hồ Chí Minh,Quận 1,Test dòng 16,Google
+Khách Hàng 17,0901000017,khach17@gmail.com,MALE,17/01/2005,THPT Chu Văn An,2023,Hà Nội,Tây Hồ,Test dòng 17,Facebook
+Khách Hàng 18,0901000018,khach18@gmail.com,FEMALE,18/01/2005,THPT Mạc Đĩnh Chi,2024,Hồ Chí Minh,Quận 6,Test dòng 18,Website
+Khách Hàng 19,0901000019,khach19@gmail.com,MALE,19/01/2005,THPT Kim Liên,2023,Hà Nội,Đống Đa,Test dòng 19,Tiktok
+Khách Hàng 20,0901000020,khach20@gmail.com,FEMALE,20/01/2005,THPT Nguyễn Thị Minh Khai,2024,Hồ Chí Minh,Quận 3,Test dòng 20,Google
+Khách Hàng 21,0901000021,khach21@gmail.com,MALE,21/01/2005,THPT Lê Hồng Phong,2023,Hồ Chí Minh,Quận 1,Test dòng 21,Facebook
+Khách Hàng 22,0901000022,khach22@gmail.com,FEMALE,22/01/2005,THPT Chuyên Hà Nội,2024,Hà Nội,Đống Đa,Test dòng 22,Website
+Khách Hàng 23,0901000023,khach23@gmail.com,MALE,23/01/2005,THPT Gia Định,2023,Hồ Chí Minh,Bình Thạnh,Test dòng 23,Tiktok
+Khách Hàng 24,0901000024,khach24@gmail.com,FEMALE,24/01/2005,THPT Amsterdam,2024,Hà Nội,Cầu Giấy,Test dòng 24,Google
+Khách Hàng 25,0901000025,khach25@gmail.com,MALE,25/01/2005,THPT Nguyễn Thượng Hiền,2023,Hồ Chí Minh,Tân Bình,Test dòng 25,Facebook
+Khách Hàng 26,0901000026,khach26@gmail.com,FEMALE,26/01/2005,THPT Trần Đại Nghĩa,2024,Hồ Chí Minh,Quận 1,Test dòng 26,Website
+Khách Hàng 27,0901000027,khach27@gmail.com,MALE,27/01/2005,THPT Chu Văn An,2023,Hà Nội,Tây Hồ,Test dòng 27,Tiktok
+Khách Hàng 28,0901000028,khach28@gmail.com,FEMALE,28/01/2005,THPT Mạc Đĩnh Chi,2024,Hồ Chí Minh,Quận 6,Test dòng 28,Google
+Khách Hàng 29,0901000029,khach29@gmail.com,MALE,29/01/2005,THPT Kim Liên,2023,Hà Nội,Đống Đa,Test dòng 29,Facebook
+Khách Hàng 30,0901000030,khach30@gmail.com,FEMALE,01/02/2005,THPT Nguyễn Thị Minh Khai,2024,Hồ Chí Minh,Quận 3,Test dòng 30,Website
+Khách Hàng 31,0901000031,khach31@gmail.com,MALE,02/02/2005,THPT Lê Hồng Phong,2023,Hồ Chí Minh,Quận 1,Test dòng 31,Tiktok
+Khách Hàng 32,0901000032,khach32@gmail.com,FEMALE,03/02/2005,THPT Chuyên Hà Nội,2024,Hà Nội,Đống Đa,Test dòng 32,Google
+Khách Hàng 33,0901000033,khach33@gmail.com,MALE,04/02/2005,THPT Gia Định,2023,Hồ Chí Minh,Bình Thạnh,Test dòng 33,Facebook
+Khách Hàng 34,0901000034,khach34@gmail.com,FEMALE,05/02/2005,THPT Amsterdam,2024,Hà Nội,Cầu Giấy,Test dòng 34,Website
+Khách Hàng 35,0901000035,khach35@gmail.com,MALE,06/02/2005,THPT Nguyễn Thượng Hiền,2023,Hồ Chí Minh,Tân Bình,Test dòng 35,Tiktok
+Khách Hàng 36,0901000036,khach36@gmail.com,FEMALE,07/02/2005,THPT Trần Đại Nghĩa,2024,Hồ Chí Minh,Quận 1,Test dòng 36,Google
+Khách Hàng 37,0901000037,khach37@gmail.com,MALE,08/02/2005,THPT Chu Văn An,2023,Hà Nội,Tây Hồ,Test dòng 37,Facebook
+Khách Hàng 38,0901000038,khach38@gmail.com,FEMALE,09/02/2005,THPT Mạc Đĩnh Chi,2024,H Hồ Chí Minh,Quận 6,Test dòng 38,Website
+Khách Hàng 39,0901000039,khach39@gmail.com,MALE,10/02/2005,THPT Kim Liên,2023,Hà Nội,Đống Đa,Test dòng 39,Tiktok
+Khách Hàng 40,0901000040,khach40@gmail.com,FEMALE,11/02/2005,THPT Nguyễn Thị Minh Khai,2024,Hồ Chí Minh,Quận 3,Test dòng 40,Google
+Khách Hàng 41,0901000041,khach41@gmail.com,MALE,12/02/2005,THPT Lê Hồng Phong,2023,Hồ Chí Minh,Quận 1,Test dòng 41,Facebook
+Khách Hàng 42,0901000042,khach42@gmail.com,FEMALE,13/02/2005,THPT Chuyên Hà Nội,2024,Hà Nội,Đống Đa,Test dòng 42,Website
+Khách Hàng 43,0901000043,khach43@gmail.com,MALE,14/02/2005,THPT Gia Định,2023,Hồ Chí Minh,Bình Thạnh,Test dòng 43,Tiktok
+Khách Hàng 44,0901000044,khach44@gmail.com,FEMALE,15/02/2005,THPT Amsterdam,2024,Hà Nội,Cầu Giấy,Test dòng 44,Google
+Khách Hàng 45,0901000045,khach45@gmail.com,MALE,16/02/2005,THPT Nguyễn Thượng Hiền,2023,Hồ Chí Minh,Tân Bình,Test dòng 45,Facebook
+Khách Hàng 46,0901000046,khach46@gmail.com,FEMALE,17/02/2005,THPT Trần Đại Nghĩa,2024,Hồ Chí Minh,Quận 1,Test dòng 46,Website
+Khách Hàng 47,0901000047,khach47@gmail.com,MALE,18/02/2005,THPT Chu Văn An,2023,Hà Nội,Tây Hồ,Test dòng 47,Tiktok
+Khách Hàng 48,0901000048,khach48@gmail.com,FEMALE,19/02/2005,THPT Mạc Đĩnh Chi,2024,Hồ Chí Minh,Quận 6,Test dòng 48,Google
+Khách Hàng 49,0901000049,khach49@gmail.com,MALE,20/02/2005,THPT Kim Liên,2023,Hà Nội,Đống Đa,Test dòng 49,Facebook
+Khách Hàng 50,0901000050,khach50@gmail.com,FEMALE,21/02/2005,THPT Nguyễn Thị Minh Khai,2024,Hồ Chí Minh,Quận 3,Test dòng 50,Website
+Khách Hàng 51,0901000051,khach51@gmail.com,MALE,22/02/2005,THPT Lê Hồng Phong,2023,Hồ Chí Minh,Quận 1,Test dòng 51,Tiktok
+Khách Hàng 52,0901000052,khach52@gmail.com,FEMALE,23/02/2005,THPT Chuyên Hà Nội,2024,Hà Nội,Đống Đa,Test dòng 52,Google
+Khách Hàng 53,0901000053,khach53@gmail.com,MALE,24/02/2005,THPT Gia Định,2023,Hồ Chí Minh,Bình Thạnh,Test dòng 53,Facebook
+Khách Hàng 54,0901000054,khach54@gmail.com,FEMALE,25/02/2005,THPT Amsterdam,2024,Hà Nội,Cầu Giấy,Test dòng 54,Website
+Khách Hàng 55,0901000055,khach55@gmail.com,MALE,26/02/2005,THPT Nguyễn Thượng Hiền,2023,Hồ Chí Minh,Tân Bình,Test dòng 55,Tiktok
+Khách Hàng 56,0901000056,khach56@gmail.com,FEMALE,27/02/2005,THPT Trần Đại Nghĩa,2024,Hồ Chí Minh,Quận 1,Test dòng 56,Google
+Khách Hàng 57,0901000057,khach57@gmail.com,MALE,28/02/2005,THPT Chu Văn An,2023,Hà Nội,Tây Hồ,Test dòng 57,Facebook
+Khách Hàng 58,0901000058,khach58@gmail.com,FEMALE,01/03/2005,THPT Mạc Đĩnh Chi,2024,Hồ Chí Minh,Quận 6,Test dòng 58,Website
+Khách Hàng 59,0901000059,khach59@gmail.com,MALE,02/03/2005,THPT Kim Liên,2023,Hà Nội,Đống Đa,Test dòng 59,Tiktok
+Khách Hàng 60,0901000060,khach60@gmail.com,FEMALE,03/03/2005,THPT Nguyễn Thị Minh Khai,2024,Hồ Chí Minh,Quận 3,Test dòng 60,Google
+Khách Hàng 61,0901000061,khach61@gmail.com,MALE,04/03/2005,THPT Lê Hồng Phong,2023,Hồ Chí Minh,Quận 1,Test dòng 61,Facebook
+Khách Hàng 62,0901000062,khach62@gmail.com,FEMALE,05/03/2005,THPT Chuyên Hà Nội,2024,Hà Nội,Đống Đa,Test dòng 62,Website
+Khách Hàng 63,0901000063,khach63@gmail.com,MALE,06/03/2005,THPT Gia Định,2023,Hồ Chí Minh,Bình Thạnh,Test dòng 63,Tiktok
+Khách Hàng 64,0901000064,khach64@gmail.com,FEMALE,07/03/2005,THPT Amsterdam,2024,Hà Nội,Cầu Giấy,Test dòng 64,Google
+Khách Hàng 65,0901000065,khach65@gmail.com,MALE,08/03/2005,THPT Nguyễn Thượng Hiền,2023,Hồ Chí Minh,Tân Bình,Test dòng 65,Facebook
+Khách Hàng 66,0901000066,khach66@gmail.com,FEMALE,09/03/2005,THPT Trần Đại Nghĩa,2024,Hồ Chí Minh,Quận 1,Test dòng 66,Website
+Khách Hàng 67,0901000067,khach67@gmail.com,MALE,10/03/2005,THPT Chu Văn An,2023,Hà Nội,Tây Hồ,Test dòng 67,Tiktok
+Khách Hàng 68,0901000068,khach68@gmail.com,FEMALE,11/03/2005,THPT Mạc Đĩnh Chi,2024,Hồ Chí Minh,Quận 6,Test dòng 68,Google
+Khách Hàng 69,0901000069,khach69@gmail.com,MALE,12/03/2005,THPT Kim Liên,2023,Hà Nội,Đống Đa,Test dòng 69,Facebook
+Khách Hàng 70,0901000070,khach70@gmail.com,FEMALE,13/03/2005,THPT Nguyễn Thị Minh Khai,2024,Hồ Chí Minh,Quận 3,Test dòng 70,Website
+Khách Hàng 71,0901000071,khach71@gmail.com,MALE,14/03/2005,THPT Lê Hồng Phong,2023,Hồ Chí Minh,Quận 1,Test dòng 71,Tiktok
+Khách Hàng 72,0901000072,khach72@gmail.com,FEMALE,15/03/2005,THPT Chuyên Hà Nội,2024,Hà Nội,Đống Đa,Test dòng 72,Google
+Khách Hàng 73,0901000073,khach73@gmail.com,MALE,16/03/2005,THPT Gia Định,2023,Hồ Chí Minh,Bình Thạnh,Test dòng 73,Facebook
+Khách Hàng 74,0901000074,khach74@gmail.com,FEMALE,17/03/2005,THPT Amsterdam,2024,Hà Nội,Cầu Giấy,Test dòng 74,Website
+Khách Hàng 75,0901000075,khach75@gmail.com,MALE,18/03/2005,THPT Nguyễn Thượng Hiền,2023,Hồ Chí Minh,Tân Bình,Test dòng 75,Tiktok
+Khách Hàng 76,0901000076,khach76@gmail.com,FEMALE,19/03/2005,THPT Trần Đại Nghĩa,2024,Hồ Chí Minh,Quận 1,Test dòng 76,Google
+Khách Hàng 77,0901000077,khach77@gmail.com,MALE,20/03/2005,THPT Chu Văn An,2023,Hà Nội,Tây Hồ,Test dòng 77,Facebook
+Khách Hàng 78,0901000078,khach78@gmail.com,FEMALE,21/03/2005,THPT Mạc Đĩnh Chi,2024,Hồ Chí Minh,Quận 6,Test dòng 78,Website
+Khách Hàng 79,0901000079,khach79@gmail.com,MALE,22/03/2005,THPT Kim Liên,2023,Hà Nội,Đống Đa,Test dòng 79,Tiktok
+Khách Hàng 80,0901000080,khach80@gmail.com,FEMALE,23/03/2005,THPT Nguyễn Thị Minh Khai,2024,Hồ Chí Minh,Quận 3,Test dòng 80,Google
+Khách Hàng 81,0901000081,khach81@gmail.com,MALE,24/03/2005,THPT Lê Hồng Phong,2023,Hồ Chí Minh,Quận 1,Test dòng 81,Facebook
+Khách Hàng 82,0901000082,khach82@gmail.com,FEMALE,25/03/2005,THPT Chuyên Hà Nội,2024,Hà Nội,Đống Đa,Test dòng 82,Website
+Khách Hàng 83,0901000083,khach83@gmail.com,MALE,26/03/2005,THPT Gia Định,2023,Hồ Chí Minh,Bình Thạnh,Test dòng 83,Tiktok
+Khách Hàng 84,0901000084,khach84@gmail.com,FEMALE,27/03/2005,THPT Amsterdam,2024,Hà Nội,Cầu Giấy,Test dòng 84,Google
+Khách Hàng 85,0901000085,khach85@gmail.com,MALE,28/03/2005,THPT Nguyễn Thượng Hiền,2023,Hồ Chí Minh,Tân Bình,Test dòng 85,Facebook
+Khách Hàng 86,0901000086,khach86@gmail.com,FEMALE,29/03/2005,THPT Trần Đại Nghĩa,2024,Hồ Chí Minh,Quận 1,Test dòng 86,Website
+Khách Hàng 87,0901000087,khach87@gmail.com,MALE,30/03/2005,THPT Chu Văn An,2023,Hà Nội,Tây Hồ,Test dòng 87,Tiktok
+Khách Hàng 88,0901000088,khach88@gmail.com,FEMALE,31/03/2005,THPT Mạc Đĩnh Chi,2024,Hồ Chí Minh,Quận 6,Test dòng 88,Google
+Khách Hàng 89,0901000089,khach89@gmail.com,MALE,01/04/2005,THPT Kim Liên,2023,Hà Nội,Đống Đa,Test dòng 89,Facebook
+Khách Hàng 90,0901000090,khach90@gmail.com,FEMALE,02/04/2005,THPT Nguyễn Thị Minh Khai,2024,Hồ Chí Minh,Quận 3,Test dòng 90,Website
+Khách Hàng 91,0901000091,khach91@gmail.com,MALE,03/04/2005,THPT Lê Hồng Phong,2023,Hồ Chí Minh,Quận 1,Test dòng 91,Tiktok
+Khách Hàng 92,0901000092,khach92@gmail.com,FEMALE,04/04/2005,THPT Chuyên Hà Nội,2024,Hà Nội,Đống Đa,Test dòng 92,Google
+Khách Hàng 93,0901000093,khach93@gmail.com,MALE,05/04/2005,THPT Gia Định,2023,Hồ Chí Minh,Bình Thạnh,Test dòng 93,Facebook
+Khách Hàng 94,0901000094,khach94@gmail.com,FEMALE,06/04/2005,THPT Amsterdam,2024,Hà Nội,Cầu Giấy,Test dòng 94,Website
+Khách Hàng 95,0901000095,khach95@gmail.com,MALE,07/04/2005,THPT Nguyễn Thượng Hiền,2023,Hồ Chí Minh,Tân Bình,Test dòng 95,Tiktok
+Khách Hàng 96,0901000096,khach96@gmail.com,FEMALE,08/04/2005,THPT Trần Đại Nghĩa,2024,Hồ Chí Minh,Quận 1,Test dòng 96,Google
+Khách Hàng 97,0901000097,khach97@gmail.com,MALE,09/04/2005,THPT Chu Văn An,2023,Hà Nội,Tây Hồ,Test dòng 97,Facebook
+Khách Hàng 98,0901000098,khach98@gmail.com,FEMALE,10/04/2005,THPT Mạc Đĩnh Chi,2024,Hồ Chí Minh,Quận 6,Test dòng 98,Website
+Khách Hàng 99,0901000099,khach99@gmail.com,MALE,11/04/2005,THPT Kim Liên,2023,Hà Nội,Đống Đa,Test dòng 99,Tiktok
+Khách Hàng 100,0901000100,khach100@gmail.com,FEMALE,12/04/2005,THPT Nguyễn Thị Minh Khai,2024,Hồ Chí Minh,Quận 3,Test dòng 100,Google

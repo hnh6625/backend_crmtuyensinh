@@ -17,6 +17,7 @@ public class LeadSpecification {
                 .and(byStatus(f.getStatusId()))
                 .and(bySource(f.getSourceId()))
                 .and(byAssignedTo(f.getAssignedTo()))
+                .and(byAssignedTo(f.getConsultantId())) // thêm dòng này
                 .and(byProvince(f.getProvince()))
                 .and(byCreatedFrom(f.getCreatedFrom()))
                 .and(byCreatedTo(f.getCreatedTo()));
@@ -33,10 +34,10 @@ public class LeadSpecification {
             if (!StringUtils.hasText(keyword)) return null;
             String like = "%" + keyword.trim().toLowerCase() + "%";
             return cb.or(
-                    cb.like(cb.lower(root.get("fullName")),        like),
-                    cb.like(root.get("phone"),                     like),
-                    cb.like(root.get("phoneNormalized"),           like),
-                    cb.like(cb.lower(root.get("email")),           like)
+                    cb.like(cb.lower(root.get("fullName")), like),
+                    cb.like(root.get("phone"), like),
+                    cb.like(root.get("phoneNormalized"), like),
+                    cb.like(cb.lower(root.get("email")), like)
             );
         };
     }

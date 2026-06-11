@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +21,7 @@ public interface ImportJobRepository extends JpaRepository<ImportJob, Long> {
     Page<ImportJob> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     // Cập nhật sang PROCESSING + ghi total
+    @Transactional
     @Modifying
     @Query("""
         UPDATE ImportJob j SET
@@ -34,6 +36,7 @@ public interface ImportJobRepository extends JpaRepository<ImportJob, Long> {
                         @Param("total")     int total);
 
     // Cập nhật progress sau mỗi chunk
+    @Transactional
     @Modifying
     @Query("""
         UPDATE ImportJob j SET
@@ -45,6 +48,7 @@ public interface ImportJobRepository extends JpaRepository<ImportJob, Long> {
                            @Param("count")    int count);
 
     // Cập nhật khi job xong
+    @Transactional
     @Modifying
     @Query("""
         UPDATE ImportJob j SET

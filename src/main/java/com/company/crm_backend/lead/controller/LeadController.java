@@ -47,9 +47,12 @@ public class LeadController {
     public ResponseEntity<ApiResponse<Page<LeadResponse>>> getList(
             @ModelAttribute LeadFilterRequest filter,
             @PageableDefault(size = 20, sort = "createdAt",
-                    direction = Sort.Direction.DESC) Pageable pageable) {
+                    direction = Sort.Direction.DESC) Pageable pageable,
+            HttpServletRequest httpReq) { // thêm
+        Long userId = (Long) httpReq.getAttribute("userId"); // thêm
+        String userRole = (String) httpReq.getAttribute("userRole"); // thêm
         return ResponseEntity.ok(ApiResponse.success(
-                leadService.getList(filter, pageable)));
+                leadService.getList(filter, pageable, userId, userRole))); // thêm
     }
 
     // Chi tiết lead

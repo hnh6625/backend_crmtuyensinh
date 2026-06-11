@@ -27,7 +27,7 @@ public class ImportJobListener implements JobExecutionListener {
 
     @Override
     public void beforeJob(JobExecution jobExecution) {
-        Long   importId = jobExecution.getJobParameters().getLong("importId");
+        Long importId = jobExecution.getJobParameters().getLong("importId");
         String filePath = jobExecution.getJobParameters().getString("filePath");
 
         // Đếm tổng số row (trừ header)
@@ -47,22 +47,33 @@ public class ImportJobListener implements JobExecutionListener {
                 importId, total, phones.size());
     }
 
+
     @Override
     public void afterJob(JobExecution jobExecution) {
         Long importId = jobExecution.getJobParameters().getLong("importId");
 
-        ImportStatus finalStatus = jobExecution.getStatus() == BatchStatus.COMPLETED
-                ? ImportStatus.COMPLETED : ImportStatus.FAILED;
+        if (importId != null) {
+            importJobRepository.findById(importId).ifPresent(job -> {
+                // 1. Tính toán số lượng dòng bị lỗi
+                int failed = Math.max(0, job.getTotalRecords() - job.getSuccessRecords());
 
-        // Tính failed = total - success
-        importJobRepository.findById(importId).ifPresent(job -> {
-            int failed = job.getTotalRecords() - job.getSuccessRecords();
-            importJobRepository.markFinished(
-                    importId, finalStatus,
-                    LocalDateTime.now(), Math.max(0, failed));
-        });
+                // 2. Chốt trạng thái: Nếu Job sập HOẶC có bất kỳ dòng nào lỗi, Đánh FAILED
+                ImportStatus finalStatus = ImportStatus.COMPLETED;
+                if (failed > 0 || jobExecution.getStatus() == org.springframework.batch.core.BatchStatus.FAILED) {
+                    finalStatus = ImportStatus.FAILED;
+                }
 
-        log.info("Import finished: id={}, status={}", importId, finalStatus);
+                // 3. Cập nhật xuống Database
+                importJobRepository.markFinished(
+                        importId,
+                        finalStatus,
+                        LocalDateTime.now(),
+                        failed
+                );
+
+                log.info("Import finished: id={}, status={}, failed={}", importId, finalStatus, failed);
+            });
+        }
     }
 
     private int countRows(String path) {

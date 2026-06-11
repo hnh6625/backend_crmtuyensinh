@@ -12,6 +12,7 @@ import com.company.crm_backend.shared.exception.AppException;
 import com.company.crm_backend.shared.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.*;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -24,9 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.io.BufferedWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @Service
@@ -44,7 +46,6 @@ public class ImportService {
     private String uploadDir;
 
     // 1. Upload file CSV → lưu disk → trigger batch job
-    @Transactional
     public ImportStatusResponse upload(MultipartFile file, Long userId) {
         validateFile(file);
 
@@ -97,8 +98,9 @@ public class ImportService {
         if (file == null || file.isEmpty())
             throw new AppException(ErrorCode.INVALID_FILE_FORMAT);
 
-        String name = file.getOriginalFilename();
-        if (name == null || !name.toLowerCase().endsWith(".csv"))
+        String name = file.getOriginalFilename().toLowerCase();
+        // 3 định dạng
+        if (!name.endsWith(".csv") && !name.endsWith(".xlsx") && !name.endsWith(".xls"))
             throw new AppException(ErrorCode.INVALID_FILE_FORMAT);
 
         // Giới hạn 50MB
@@ -110,31 +112,74 @@ public class ImportService {
         try {
             Path dir = Path.of(uploadDir);
             Files.createDirectories(dir);
-            String name = System.currentTimeMillis() + "_"
-                    + file.getOriginalFilename();
-            Path dest = dir.resolve(name);
-            file.transferTo(dest.toFile());
-            return dest.toString();
-        } catch (IOException e) {
+            String originalName = file.getOriginalFilename().toLowerCase();
+
+            // 1. Nếu là CSV -> Lưu thẳng xuống đĩa luôn
+            if (originalName.endsWith(".csv")) {
+                String name = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                Path dest = dir.resolve(name);
+                Files.copy(file.getInputStream(), dest.toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+                return dest.toString();
+            }
+
+            // 2. Nếu là Excel -> Đọc và chuyển đổi sang file CSV tạm
+            String csvName = System.currentTimeMillis() + "_converted.csv";
+            Path csvDest = dir.resolve(csvName);
+
+            try (Workbook workbook = WorkbookFactory.create(file.getInputStream());
+                 BufferedWriter writer = Files.newBufferedWriter(csvDest)) {
+
+                Sheet sheet = workbook.getSheetAt(0);
+                DataFormatter formatter = new DataFormatter();
+
+                for (Row row : sheet) {
+                    boolean isRowEmpty = true;
+                    for (int i = 0; i < 11; i++) { // Kiểm tra 11 cột
+                        Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+                        if (cell != null && cell.getCellType() != CellType.BLANK) {
+                            String val = formatter.formatCellValue(cell).trim();
+                            if (!val.isEmpty()) {
+                                isRowEmpty = false;
+                                break; // Chỉ cần 1 ô có chữ là dòng này hợp lệ
+                            }
+                        }
+                    }
+                    if (isRowEmpty) continue; // không ghi dòng này vào file CSV
+
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < 11; i++) {
+                        Cell cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                        String val = formatter.formatCellValue(cell);
+                        val = val.replace("\"", "\"\"");
+                        sb.append("\"").append(val).append("\",");
+                    }
+                    writer.write(sb.substring(0, sb.length() - 1));
+                    writer.newLine();
+                }
+                return csvDest.toString();
+            }
+        } catch (Exception e) {
+            log.error("Lỗi khi xử lý file upload", e);
             throw new AppException(ErrorCode.INTERNAL_ERROR);
         }
     }
 
-    @Async
     public void triggerBatch(Long importId, String filePath) {
-        try {
-            JobParameters params = new JobParametersBuilder()
-                    .addLong("importId",   importId)
-                    .addString("filePath", filePath)
-                    .addLong("time",       System.currentTimeMillis())
-                    .toJobParameters();
-            jobLauncher.run(importLeadsJob, params);
-        } catch (Exception e) {
-            log.error("Batch trigger failed: importId={}", importId, e);
-            importJobRepository.findById(importId).ifPresent(j -> {
-                j.setImportStatus(ImportStatus.FAILED);
-                importJobRepository.save(j);
-            });
-        }
+        java.util.concurrent.CompletableFuture.runAsync(() -> {
+            try {
+                JobParameters params = new JobParametersBuilder()
+                        .addLong("importId", importId)
+                        .addString("filePath", filePath)
+                        .addLong("time", System.currentTimeMillis())
+                        .toJobParameters();
+                jobLauncher.run(importLeadsJob, params);
+            } catch (Exception e) {
+                log.error("Batch trigger failed: importId={}", importId, e);
+                importJobRepository.findById(importId).ifPresent(j -> {
+                    j.setImportStatus(ImportStatus.FAILED);
+                    importJobRepository.save(j);
+                });
+            }
+        });
     }
 }

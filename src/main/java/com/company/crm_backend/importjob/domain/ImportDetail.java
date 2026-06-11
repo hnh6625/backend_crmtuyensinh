@@ -1,5 +1,6 @@
 package com.company.crm_backend.importjob.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,6 +21,7 @@ public class ImportDetail {
     @Column(name = "detail_id")
     private Long detailId;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "import_id", nullable = false)
     private ImportJob importJob;
