@@ -44,14 +44,20 @@ public class LeadSpecification {
 
     // ── Lọc theo trạng thái
     private static Specification<Lead> byStatus(Long statusId) {
-        return (root, q, cb) -> statusId == null ? null
-                : cb.equal(root.get("status").get("statusId"), statusId);
+        return (root, q, cb) -> {
+            if (statusId == null) return null;
+            // Dùng join() thay vì get() để tránh lỗi Hibernate
+            return cb.equal(root.join("status").get("statusId"), statusId);
+        };
     }
 
     // ── Lọc theo nguồn
     private static Specification<Lead> bySource(Long sourceId) {
-        return (root, q, cb) -> sourceId == null ? null
-                : cb.equal(root.get("source").get("sourceId"), sourceId);
+        return (root, q, cb) -> {
+            if (sourceId == null) return null;
+            // Dùng join() thay vì get() để tránh lỗi Hibernate
+            return cb.equal(root.join("source").get("sourceId"), sourceId);
+        };
     }
 
     // Lọc theo người phụ trách
