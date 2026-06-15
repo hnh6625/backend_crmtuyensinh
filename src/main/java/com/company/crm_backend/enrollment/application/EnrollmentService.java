@@ -35,21 +35,18 @@ public class EnrollmentService {
 
     private final EnrollmentRepository enrollmentRepository;
     private final MajorRepository majorRepository;
-    // Đã xoá CampusRepository và SemesterRepository
     private final LeadRepository leadRepository;
     private final UserRepository userRepository;
 
-    // Thêm Repository để tự động đổi trạng thái khách hàng & ghi lịch sử
     private final LeadStatusRepository leadStatusRepository;
     private final LeadHistoryService historyService;
+    private final DepartmentRepository departmentRepository;
 
-    // Dropdown — chỉ còn Khoa/Ngành
     @Transactional(readOnly = true)
     public List<Major> getActiveMajors() {
         return majorRepository.findAllByIsActiveTrue();
     }
 
-    // Danh sách enrollment có filter + phân trang
     @Transactional(readOnly = true)
     public Page<EnrollmentResponse> getList(EnrollmentFilterRequest filter, Pageable pageable) {
         return enrollmentRepository
@@ -57,7 +54,6 @@ public class EnrollmentService {
                 .map(EnrollmentResponse::from);
     }
 
-    // Chi tiết 1 enrollment
     @Transactional(readOnly = true)
     public EnrollmentResponse getById(Long id) {
         return enrollmentRepository.findByIdWithDetails(id)
@@ -65,56 +61,54 @@ public class EnrollmentService {
                 .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
     }
 
-    // Lấy enrollment theo lead
     @Transactional(readOnly = true)
     public EnrollmentResponse getByLeadId(Long leadId) {
         return enrollmentRepository.findByLead_LeadId(leadId)
                 .map(EnrollmentResponse::from)
-                .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
+                .orElse(null);
     }
 
-    // Tạo enrollment mới
+    // TẠO MỚI NHẬP HỌC (ĐÃ FIX)
     public EnrollmentResponse create(CreateEnrollmentRequest req, Long enrolledByUserId) {
-        // Kiểm tra lead tồn tại
         Lead lead = leadRepository.findByLeadIdAndDeletedAtIsNull(req.getLeadId())
                 .orElseThrow(() -> new AppException(ErrorCode.LEAD_NOT_FOUND));
 
-        // Kiểm tra lead chưa nhập học
         if (enrollmentRepository.existsByLead_LeadId(req.getLeadId()))
             throw new AppException(ErrorCode.LEAD_ALREADY_ENROLLED);
 
-        // Lấy các danh mục
         Major major = majorRepository.findById(req.getMajorId())
                 .orElseThrow(() -> new AppException(ErrorCode.MAJOR_NOT_FOUND));
         User enrolledBy = userRepository.findById(enrolledByUserId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        // Logic tính toán học phí
-        BigDecimal tuitionFee  = major.getTuitionFee() != null ? major.getTuitionFee() : BigDecimal.ZERO;
-
-        BigDecimal scholarship = req.getScholarshipAmount() != null ? req.getScholarshipAmount() : BigDecimal.ZERO;
-        BigDecimal finalFee    = tuitionFee.subtract(scholarship);
-
-        if (finalFee.compareTo(BigDecimal.ZERO) < 0)
-            throw new AppException(ErrorCode.SCHOLARSHIP_EXCEEDS_TUITION);
+        // ƯU TIÊN LẤY HỌC PHÍ TỪ FRONTEND GỬI LÊN
+        BigDecimal tuitionFee;
+        if (req.getTuitionFee() != null) {
+            tuitionFee = BigDecimal.valueOf(req.getTuitionFee());
+        } else if (major.getTuitionFee() != null) {
+            tuitionFee = major.getTuitionFee();
+        } else {
+            tuitionFee = BigDecimal.valueOf(10000000); // Mặc định 10 triệu
+        }
 
         Enrollment enrollment = Enrollment.builder()
                 .lead(lead)
                 .major(major)
                 .tuitionFee(tuitionFee)
-                .scholarshipAmount(scholarship)
-                .finalFee(finalFee)
-                .conversionSource(req.getConversionSource())
+                .scholarshipAmount(BigDecimal.ZERO)
+                .finalFee(tuitionFee) // Vì đã bỏ học bổng nên Phí cuối = Học phí
+                .paymentMethod(req.getPaymentMethod())
                 .convertedAt(LocalDateTime.now())
                 .note(req.getNote())
                 .enrolledBy(enrolledBy)
-                .enrollmentStatus(EnrollmentStatus.PENDING) // Set trạng thái mặc định
+                .enrollmentStatus(EnrollmentStatus.PENDING)
                 .build();
 
         enrollmentRepository.save(enrollment);
 
-        LeadStatus enrolledStatus = leadStatusRepository.findByStatusName("Đã nhập học")
-                .orElseThrow(() -> new RuntimeException("Chưa có trạng thái 'Đã nhập học' trong DB"));
+        // Tự động đổi trạng thái Lead
+        LeadStatus enrolledStatus = leadStatusRepository.findByStatusName("Đã đăng ký")
+                .orElseThrow(() -> new RuntimeException("Chưa có trạng thái 'Đã đăng ký' trong DB"));
         lead.setStatus(enrolledStatus);
         leadRepository.save(lead);
 
@@ -127,12 +121,11 @@ public class EnrollmentService {
         return EnrollmentResponse.from(enrollment);
     }
 
-    // Cập nhật enrollment
+    // CẬP NHẬT NHẬP HỌC
     public EnrollmentResponse update(Long id, UpdateEnrollmentRequest req) {
         Enrollment e = enrollmentRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.ENROLLMENT_NOT_FOUND));
 
-        // Không cho sửa khi đã CANCELLED hoặc COMPLETED
         if (e.getEnrollmentStatus() == EnrollmentStatus.CANCELLED
                 || e.getEnrollmentStatus() == EnrollmentStatus.COMPLETED)
             throw new AppException(ErrorCode.INVALID_STATUS_TRANSITION);
@@ -141,22 +134,19 @@ public class EnrollmentService {
             Major major = majorRepository.findById(req.getMajorId())
                     .orElseThrow(() -> new AppException(ErrorCode.MAJOR_NOT_FOUND));
             e.setMajor(major);
-            e.setTuitionFee(major.getTuitionFee());
         }
 
-        // Đã loại bỏ logic cập nhật Campus và Semester ở đây
+        // Cập nhật học phí từ Frontend
+        if (req.getTuitionFee() != null) {
+            e.setTuitionFee(BigDecimal.valueOf(req.getTuitionFee()));
+        }
 
-        if (req.getScholarshipAmount() != null)
-            e.setScholarshipAmount(req.getScholarshipAmount());
-        if (StringUtils.hasText(req.getStudentCode()))
-            e.setStudentCode(req.getStudentCode());
-        if (req.getNote() != null)
-            e.setNote(req.getNote());
+        if (StringUtils.hasText(req.getStudentCode())) e.setStudentCode(req.getStudentCode());
+        if (req.getNote() != null) e.setNote(req.getNote());
 
-        // Tính lại finalFee
-        BigDecimal tuition     = e.getTuitionFee() != null ? e.getTuitionFee() : BigDecimal.ZERO;
-        BigDecimal scholarship = e.getScholarshipAmount() != null ? e.getScholarshipAmount() : BigDecimal.ZERO;
-        e.setFinalFee(tuition.subtract(scholarship));
+        // Đồng bộ finalFee
+        BigDecimal tuition = e.getTuitionFee() != null ? e.getTuitionFee() : BigDecimal.ZERO;
+        e.setFinalFee(tuition);
 
         return EnrollmentResponse.from(enrollmentRepository.save(e));
     }
@@ -175,5 +165,9 @@ public class EnrollmentService {
 
         log.info("Enrollment {} status → {}", id, newStatus);
         return EnrollmentResponse.from(e);
+    }
+
+    public List<Department> getActiveDepartments() {
+        return departmentRepository.findAllByIsActiveTrue();
     }
 }

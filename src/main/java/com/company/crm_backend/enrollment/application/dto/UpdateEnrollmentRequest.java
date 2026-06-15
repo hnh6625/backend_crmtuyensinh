@@ -7,7 +7,8 @@ import java.math.BigDecimal;
 @Getter
 public class UpdateEnrollmentRequest {
     private Long majorId;
-    private BigDecimal scholarshipAmount;
+    private Double tuitionFee;
+
     private String studentCode;
     private String note;
 }

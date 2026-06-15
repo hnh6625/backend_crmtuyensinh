@@ -24,13 +24,10 @@ public interface EnrollmentRepository
     // Đếm theo trạng thái
     long countByEnrollmentStatus(EnrollmentStatus status);
 
-    // Fetch join tránh N+1 khi getById
     @Query("""
             SELECT e FROM Enrollment e
             JOIN FETCH e.lead l
             JOIN FETCH e.major m
-            JOIN FETCH e.campus c
-            JOIN FETCH e.semester s
             LEFT JOIN FETCH e.enrolledBy u
             WHERE e.enrollmentId = :id
             """)
@@ -59,7 +56,6 @@ public interface EnrollmentRepository
     int assignStudentCode(@Param("id") Long id,
                           @Param("studentCode") String studentCode);
 
-    // Thống kê theo ngành trong 1 học kỳ
     @Query(value = """
             SELECT
                 m.major_code,
@@ -71,9 +67,8 @@ public interface EnrollmentRepository
                 COALESCE(SUM(e.final_fee), 0)           AS total_fee
             FROM enrollments e
             JOIN majors m ON e.major_id = m.major_id
-            WHERE e.semester_id = :semesterId
             GROUP BY m.major_id, m.major_code, m.major_name
             ORDER BY total DESC
             """, nativeQuery = true)
-    List<Object[]> statsBySemesterGroupByMajor(@Param("semesterId") Long semesterId);
+    List<Object[]> statsGroupByMajor();
 }

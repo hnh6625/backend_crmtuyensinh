@@ -14,51 +14,43 @@ import java.time.LocalDateTime;
 @Table(name = "enrollments")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Enrollment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "enrollment_id")
     private Long enrollmentId;
 
-    // 1 lead chỉ nhập học 1 lần — UNIQUE
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lead_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lead_id", nullable = false)
     private Lead lead;
-
-    @Column(name = "student_code", unique = true, length = 50)
-    private String studentCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "major_id", nullable = false)
     private Major major;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "enrollment_status",
-            columnDefinition = "ENUM('PENDING','CONFIRMED','CANCELLED','COMPLETED')")
-    @Builder.Default
-    private EnrollmentStatus enrollmentStatus = EnrollmentStatus.PENDING;
-
-    @Column(name = "tuition_fee", precision = 15, scale = 2)
+    @Column(precision = 15, scale = 2)
     private BigDecimal tuitionFee;
 
-    @Column(name = "scholarship_amount", precision = 15, scale = 2)
-    @Builder.Default
-    private BigDecimal scholarshipAmount = BigDecimal.ZERO;
+    @Column(precision = 15, scale = 2)
+    private BigDecimal scholarshipAmount;
 
-    @Column(name = "final_fee", precision = 15, scale = 2)
+    @Column(precision = 15, scale = 2)
     private BigDecimal finalFee;
 
-    @Column(name = "conversion_source", length = 100)
-    private String conversionSource;
+    private String paymentMethod;
+    private String studentCode;
 
-    @Column(name = "converted_at")
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private EnrollmentStatus enrollmentStatus;
+
+    private String conversionSource;
     private LocalDateTime convertedAt;
 
-    @Column(name = "note", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String note;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -66,14 +58,8 @@ public class Enrollment {
     private User enrolledBy;
 
     @CreationTimestamp
-    @Column(name = "enrollment_date", updatable = false)
-    private LocalDateTime enrollmentDate;
-
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }

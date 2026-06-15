@@ -3,8 +3,10 @@ package com.company.crm_backend.lead.domain.dto;
 import com.company.crm_backend.lead.domain.Lead;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.cglib.core.Local;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -19,7 +21,7 @@ public class LeadResponse {
     private String phoneNormalized;
     private String email;
     private String gender;
-    private String birthDate;
+    private LocalDate birthDate;
     private String schoolName;
     private Integer graduationYear;
     private String address;
@@ -59,8 +61,7 @@ public class LeadResponse {
                 .phoneNormalized(l.getPhoneNormalized())
                 .email(l.getEmail())
                 .gender(l.getGender() != null ? l.getGender().name() : null)
-                .birthDate(l.getBirthDate() != null
-                        ? l.getBirthDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : null)
+                .birthDate(l.getBirthDate())
                 .schoolName(l.getSchoolName())
                 .graduationYear(l.getGraduationYear())
                 .address(l.getAddress())

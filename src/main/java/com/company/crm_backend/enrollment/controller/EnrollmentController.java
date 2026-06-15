@@ -59,4 +59,9 @@ public class EnrollmentController {
                                           @RequestParam EnrollmentStatus status) {
         return ResponseEntity.ok(ApiResponse.success(enrollmentService.updateStatus(id, status)));
     }
+
+    @GetMapping("/departments")
+    public ResponseEntity<?> getDepartments() {
+        return ResponseEntity.ok(ApiResponse.success(enrollmentService.getActiveDepartments()));
+    }
 }

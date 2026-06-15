@@ -86,7 +86,22 @@ public class LeadService {
         LeadStatus status = getStatusById(req.getStatusId());
         User assignedTo = getUserById(req.getAssignedTo());
 
-        Lead lead = Lead.builder().fullName(req.getFullName().trim()).phone(req.getPhone().trim()).phoneNormalized(normalized).email(req.getEmail()).gender(req.getGender()).birthDate(parseDate(req.getBirthDate())).schoolName(req.getSchoolName()).graduationYear(req.getGraduationYear()).address(req.getAddress()).province(req.getProvince()).note(req.getNote()).source(source).status(status).assignedTo(assignedTo).createdBy(createdBy).build();
+        Lead lead = Lead.builder()
+                .fullName(req.getFullName().trim())
+                .phone(req.getPhone().trim())
+                .phoneNormalized(normalized)
+                .email(req.getEmail())
+                .gender(req.getGender())
+                .birthDate(req.getBirthDate())
+                .schoolName(req.getSchoolName())
+                .graduationYear(req.getGraduationYear())
+                .address(req.getAddress())
+                .province(req.getProvince())
+                .note(req.getNote())
+                .source(source)
+                .status(status)
+                .assignedTo(assignedTo)
+                .createdBy(createdBy).build();
 
         leadRepository.save(lead);
 
@@ -115,7 +130,7 @@ public class LeadService {
         }
         if (req.getEmail() != null) lead.setEmail(req.getEmail());
         if (req.getGender() != null) lead.setGender(req.getGender());
-        if (req.getBirthDate() != null) lead.setBirthDate(parseDate(req.getBirthDate()));
+        if (req.getBirthDate() != null) lead.setBirthDate(req.getBirthDate());
         if (req.getSchoolName() != null) lead.setSchoolName(req.getSchoolName());
         if (req.getGraduationYear() != null) lead.setGraduationYear(req.getGraduationYear());
         if (req.getAddress() != null) lead.setAddress(req.getAddress());
@@ -222,10 +237,11 @@ public class LeadService {
     }
 
     private LocalDate parseDate(String dateStr) {
-        if (!StringUtils.hasText(dateStr)) return null;
+        if (dateStr == null || dateStr.isEmpty()) return null;
         try {
-            return LocalDate.parse(dateStr.trim(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            return LocalDate.parse(dateStr);
         } catch (Exception e) {
+            log.error("Lỗi định dạng ngày sinh: {}", dateStr);
             return null;
         }
     }
