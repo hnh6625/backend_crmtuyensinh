@@ -10,70 +10,42 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class EnrollmentResponse {
-
-    private Long enrollmentId;
-    private String studentCode;
-
-    // Thông tin lead
+    private Long id;
     private Long leadId;
     private String leadName;
     private String leadPhone;
-    private String leadEmail;
 
-    // Ngành học
     private Long majorId;
-    private String majorCode;
     private String majorName;
 
-    // Cơ sở
-    private Long campusId;
-    private String campusName;
-
-    // Học kỳ
-    private Long semesterId;
-    private String semesterCode;
-    private String semesterName;
-
-    // Học phí
     private BigDecimal tuitionFee;
     private BigDecimal scholarshipAmount;
     private BigDecimal finalFee;
 
+    private String studentCode;
+    private String paymentMethod;
     private String enrollmentStatus;
-    private String conversionSource;
     private String note;
-    private String enrolledByName;
-    private LocalDateTime enrollmentDate;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String enrolledByName;
 
     public static EnrollmentResponse from(Enrollment e) {
         return EnrollmentResponse.builder()
-                .enrollmentId(e.getEnrollmentId())
-                .studentCode(e.getStudentCode())
-                .leadId(e.getLead().getLeadId())
-                .leadName(e.getLead().getFullName())
-                .leadPhone(e.getLead().getPhone())
-                .leadEmail(e.getLead().getEmail())
-                .majorId(e.getMajor().getMajorId())
-                .majorCode(e.getMajor().getMajorCode())
-                .majorName(e.getMajor().getMajorName())
-                .campusId(e.getCampus().getCampusId())
-                .campusName(e.getCampus().getCampusName())
-                .semesterId(e.getSemester().getSemesterId())
-                .semesterCode(e.getSemester().getSemesterCode())
-                .semesterName(e.getSemester().getSemesterName())
+                .id(e.getEnrollmentId())
+                .leadId(e.getLead() != null ? e.getLead().getLeadId() : null)
+                .leadName(e.getLead() != null ? e.getLead().getFullName() : null)
+                .leadPhone(e.getLead() != null ? e.getLead().getPhone() : null)
+                .majorId(e.getMajor() != null ? e.getMajor().getMajorId() : null)
+                .majorName(e.getMajor() != null ? e.getMajor().getMajorName() : null)
                 .tuitionFee(e.getTuitionFee())
                 .scholarshipAmount(e.getScholarshipAmount())
                 .finalFee(e.getFinalFee())
-                .enrollmentStatus(e.getEnrollmentStatus().name())
-                .conversionSource(e.getConversionSource())
+                .studentCode(e.getStudentCode())
+                .paymentMethod(e.getPaymentMethod())
+                .enrollmentStatus(e.getEnrollmentStatus() != null ? e.getEnrollmentStatus().name() : null)
                 .note(e.getNote())
-                .enrolledByName(e.getEnrolledBy() != null
-                        ? e.getEnrolledBy().getFullName() : null)
-                .enrollmentDate(e.getEnrollmentDate())
                 .createdAt(e.getCreatedAt())
-                .updatedAt(e.getUpdatedAt())
+                .enrolledByName(e.getEnrolledBy() != null ? e.getEnrolledBy().getFullName() : null)
                 .build();
     }
 }

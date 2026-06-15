@@ -36,14 +36,6 @@ public class Enrollment {
     @JoinColumn(name = "major_id", nullable = false)
     private Major major;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "campus_id", nullable = false)
-    private Campus campus;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "semester_id", nullable = false)
-    private Semester semester;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "enrollment_status",
             columnDefinition = "ENUM('PENDING','CONFIRMED','CANCELLED','COMPLETED')")

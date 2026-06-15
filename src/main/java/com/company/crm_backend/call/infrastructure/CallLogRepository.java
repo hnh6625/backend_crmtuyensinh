@@ -16,6 +16,9 @@ public interface CallLogRepository extends JpaRepository<CallLog, Long> {
     //Đếm số lần đã gọi
     long countByLead_LeadId(Long leadId);
 
+    // Đếm số lần gọi mà kết quả nằm trong danh sách (VD: Không nghe máy, Thuê bao)
+    long countByLead_LeadIdAndResult_ResultNameIn(Long leadId, List<String> resultNames);
+
     // Lấy số thứ tự gọi lớn nhất của lead
     @Query("SELECT MAX(c.callAttemptNo) FROM CallLog c WHERE c.lead.leadId = :leadId")
     Optional<Integer> findMaxAttemptByLeadId(@Param("leadId") Long leadId);

@@ -3,8 +3,10 @@ package com.company.crm_backend.call.dto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class CreateCallLogRequest {
 
     @NotNull(message = "Lead không được trống")
