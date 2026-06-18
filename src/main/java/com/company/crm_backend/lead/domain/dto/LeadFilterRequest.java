@@ -16,4 +16,5 @@ public class LeadFilterRequest {
     private LocalDateTime createdFrom;
     private LocalDateTime createdTo;
     private Long consultantId;
+    private Long createdBy;
 }

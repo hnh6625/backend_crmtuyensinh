@@ -50,6 +50,11 @@ public class LeadResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    private Long createdById;
+
+    @lombok.Setter // cho phép gán tay tên người tạo
+    private String createdByName;
+
     // Tags
     private List<String> tags;
 
@@ -79,6 +84,7 @@ public class LeadResponse {
                 .nextFollowUpAt(l.getNextFollowUpAt())
                 .createdAt(l.getCreatedAt())
                 .updatedAt(l.getUpdatedAt())
+                .createdById(l.getCreatedBy())
                 .build();
     }
 

@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -81,8 +82,9 @@ public class LeadController {
             @Valid @RequestBody UpdateLeadRequest req,
             HttpServletRequest httpReq) {
         Long userId = (Long) httpReq.getAttribute("userId");
+        String userRole = (String) httpReq.getAttribute("userRole");
         return ResponseEntity.ok(ApiResponse.success(
-                leadService.update(id, req, userId)));
+                leadService.update(id, req, userId, userRole)));
     }
 
     // Phân công lead
@@ -97,12 +99,13 @@ public class LeadController {
     }
 
     // Xóa mềm
+    @PreAuthorize("hasRole(T(com.company.crm_backend.User.domain.RoleConstants).MANAGER)")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(
             @PathVariable Long id,
             HttpServletRequest httpReq) {
         Long userId = (Long) httpReq.getAttribute("userId");
-        leadService.delete(id, userId);
+        String userRole = (String) httpReq.getAttribute("userRole");
         return ResponseEntity.ok(ApiResponse.success());
     }
 

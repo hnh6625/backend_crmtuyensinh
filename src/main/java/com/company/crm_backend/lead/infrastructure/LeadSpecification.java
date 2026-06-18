@@ -11,16 +11,20 @@ public class LeadSpecification {
 
     // Build tất cả điều kiện filter
     public static Specification<Lead> build(LeadFilterRequest f) {
+
         return Specification
                 .allOf(notDeleted())
                 .and(byKeyword(f.getKeyword()))
                 .and(byStatus(f.getStatusId()))
                 .and(bySource(f.getSourceId()))
                 .and(byAssignedTo(f.getAssignedTo()))
-                .and(byAssignedTo(f.getConsultantId())) // thêm dòng này
+                .and(byAssignedTo(f.getConsultantId()))
+                .and(byCreatedBy(f.getCreatedBy()))
                 .and(byProvince(f.getProvince()))
                 .and(byCreatedFrom(f.getCreatedFrom()))
                 .and(byCreatedTo(f.getCreatedTo()));
+
+
     }
 
     // Chỉ lấy lead chưa bị soft delete
@@ -84,4 +88,10 @@ public class LeadSpecification {
         return (root, q, cb) -> to == null ? null
                 : cb.lessThanOrEqualTo(root.get("createdAt"), to);
     }
+    // lọc theo người tạo
+    private static Specification<Lead> byCreatedBy(Long userId) {
+        return (root, q, cb) -> userId == null ? null
+                : cb.equal(root.get("createdBy"), userId);
+    }
+
 }

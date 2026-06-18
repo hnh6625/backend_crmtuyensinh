@@ -54,16 +54,24 @@ public class LeadService {
     // Danh sách lead có filter + phân trang
     @Transactional(readOnly = true)
     public Page<LeadResponse> getList(LeadFilterRequest filter, Pageable pageable, Long userId, String userRole) {
-        // Nếu là CONSULTANT hoặc COLLABORATOR → chỉ xem lead của mình
-        if ("CONSULTANT".equals(userRole) || "COLLABORATOR".equals(userRole)) {
+        // Nếu là CONSULTANT → chỉ xem lead của mình
+        if ("CONSULTANT".equals(userRole)) {
             filter.setConsultantId(userId);
+        } else if ("COLLABORATOR".equals(userRole)) {
+            filter.setCreatedBy(userId); //
         }
         return leadRepository.findAll(LeadSpecification.build(filter), pageable).map(lead -> {
-            // Query thêm danh sách tags cho từng lead trong danh sách
-            List<String> tags = leadTagMapRepository.findAllByLead_LeadId(lead.getLeadId()).stream().map(m -> m.getTag().getTagName()).toList();
+            List<String> tags = leadTagMapRepository.findAllByLead_LeadId(lead.getLeadId())
+                    .stream().map(m -> m.getTag().getTagName()).toList();
 
-            // Sử dụng hàm from(lead, tags)
-            return LeadResponse.from(lead, tags);
+            LeadResponse res = LeadResponse.from(lead, tags);
+
+            if (lead.getCreatedBy() != null) {
+                userRepository.findById(lead.getCreatedBy()).ifPresent(u -> {
+                    res.setCreatedByName(u.getFullName());
+                });
+            }
+            return res;
         });
     }
 
@@ -72,7 +80,14 @@ public class LeadService {
     public LeadResponse getById(Long leadId) {
         Lead lead = findOrThrow(leadId);
         List<String> tags = leadTagMapRepository.findAllByLead_LeadId(leadId).stream().map(m -> m.getTag().getTagName()).toList();
-        return LeadResponse.from(lead, tags);
+        LeadResponse res = LeadResponse.from(lead, tags);
+
+        if (lead.getCreatedBy() != null) {
+            userRepository.findById(lead.getCreatedBy()).ifPresent(u -> {
+                res.setCreatedByName(u.getFullName());
+            });
+        }
+        return res;
     }
 
     // Tạo lead mới
@@ -120,7 +135,7 @@ public class LeadService {
     }
 
     // Cập nhật thông tin lead
-    public LeadResponse update(Long leadId, UpdateLeadRequest req, Long changedBy) {
+    public LeadResponse update(Long leadId, UpdateLeadRequest req, Long changedBy, String userRole) {
         Lead lead = findOrThrow(leadId);
 
         String oldStatus = lead.getStatus() != null ? lead.getStatus().getStatusName() : null;
@@ -142,6 +157,11 @@ public class LeadService {
         if (req.getSourceId() != null) lead.setSource(getSourceById(req.getSourceId()));
 
         if (req.getStatusId() != null) {
+            if ("COLLABORATOR".equals(userRole)) {
+                if (lead.getStatus() == null || !lead.getStatus().getStatusId().equals(req.getStatusId())) {
+                    throw new RuntimeException("Cộng tác viên không được phép thay đổi trạng thái của hồ sơ!");
+                }
+            }
             LeadStatus newStatus = leadStatusRepository.findById(req.getStatusId())
                     .orElseThrow(() -> new AppException(ErrorCode.LEAD_STATUS_NOT_FOUND));
 
@@ -190,7 +210,10 @@ public class LeadService {
     }
 
     // Xóa mềm lead
-    public void delete(Long leadId, Long deletedBy) {
+    public void delete(Long leadId, Long deletedBy, String userRole) {
+        if ("COLLABORATOR".equals(userRole)) {
+            throw new RuntimeException("Cộng tác viên không có quyền xóa hồ sơ!");
+        }
         findOrThrow(leadId);
         leadRepository.softDelete(leadId, LocalDateTime.now());
         historyService.record(leadId, "DELETE", null, "Đã xóa", deletedBy);
