@@ -245,9 +245,24 @@ public class LeadService {
     }
 
     private String normalizePhone(String phone) {
-        if (phone == null) return null;
-        String p = phone.trim().replaceAll("\\s+", "");
-        return p.startsWith("+84") ? "0" + p.substring(3) : p;
+        if (phone == null || phone.trim().isEmpty()) return null;
+
+        // Xóa toàn bộ khoảng trắng và các ký tự không phải số (giữ lại dấu +)
+        String p = phone.trim().replaceAll("[^0-9+]", "");
+
+        // Nếu bắt đầu bằng +84 -> Chuyển thành 0
+        if (p.startsWith("+84")) {
+            p = "0" + p.substring(3);
+        }
+        // Nếu người dùng nhập 84 ở đầu (11 số) -> Chuyển thành 0
+        else if (p.startsWith("84") && p.length() == 11) {
+            p = "0" + p.substring(2);
+        }
+        else if (p.length() == 9 && p.matches("^[35789]\\d{8}$")) {
+            p = "0" + p;
+        }
+
+        return p;
     }
 
     private LocalDate parseDate(String dateStr) {
