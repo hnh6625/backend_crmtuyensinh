@@ -5,6 +5,7 @@ import com.company.crm_backend.lead.domain.LeadSource;
 import com.company.crm_backend.lead.domain.LeadStatus;
 import com.company.crm_backend.lead.domain.LeadTag;
 import com.company.crm_backend.lead.domain.dto.*;
+import com.company.crm_backend.lead.infrastructure.LeadRepository;
 import com.company.crm_backend.shared.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -25,6 +26,7 @@ import java.util.List;
 public class LeadController {
 
     private final LeadService leadService;
+    private final LeadRepository leadRepository;
 
     // Dropdown data
     @GetMapping("/sources")
@@ -109,5 +111,16 @@ public class LeadController {
     public ResponseEntity<ApiResponse<List<LeadHistoryResponse>>> getHistory(
             @PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(leadService.getHistory(id)));
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Long> getTotalLeads() {
+        long total = leadRepository.count();
+        return ResponseEntity.ok(total);
+    }
+
+    @GetMapping("/stats/status")
+    public ResponseEntity<List<LeadStatusStatDto>> getLeadStatusStats() {
+        return ResponseEntity.ok(leadService.getLeadStatusStats());
     }
 }

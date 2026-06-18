@@ -1,6 +1,7 @@
 package com.company.crm_backend.lead.infrastructure;
 
 import com.company.crm_backend.lead.domain.Lead;
+import com.company.crm_backend.lead.domain.dto.LeadStatusStatDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -43,4 +44,8 @@ public interface LeadRepository
     @Query("UPDATE Lead l SET l.deletedAt = :now WHERE l.leadId = :leadId")
     void softDelete(@Param("leadId") Long leadId,
                     @Param("now")    LocalDateTime now);
+
+    @Query("SELECT new com.company.crm_backend.lead.domain.dto.LeadStatusStatDto(ls.statusName, COUNT(l)) " +
+            "FROM Lead l JOIN l.status ls GROUP BY ls.statusName")
+    List<LeadStatusStatDto> countLeadsByStatus();
 }

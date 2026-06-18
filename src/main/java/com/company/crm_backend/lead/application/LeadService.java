@@ -84,12 +84,10 @@ public class LeadService {
 
         // Lấy FK
         LeadSource source = getSourceById(req.getSourceId());
-        LeadStatus status = getStatusById(req.getStatusId());
-        User assignedTo = getUserById(req.getAssignedTo());
+        Long defaultNewStatusId = 1L;
+        LeadStatus status = getStatusById(defaultNewStatusId);
 
-        if (status != null && (status.getStatusName().equalsIgnoreCase("Đã đăng ký"))) {
-            throw new RuntimeException("Không được phép tự chọn trạng thái Đã đăng ký/Đã nhập học. Vui lòng tạo hồ sơ và dùng chức năng Chốt nhập học!");
-        }
+        User assignedTo = getUserById(req.getAssignedTo());
 
         Lead lead = Lead.builder()
                 .fullName(req.getFullName().trim())
@@ -273,5 +271,9 @@ public class LeadService {
             log.error("Lỗi định dạng ngày sinh: {}", dateStr);
             return null;
         }
+    }
+
+    public List<LeadStatusStatDto> getLeadStatusStats() {
+        return leadRepository.countLeadsByStatus();
     }
 }
