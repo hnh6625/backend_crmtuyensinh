@@ -21,7 +21,6 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -53,7 +52,7 @@ public class UserService {
         return userRepository
                 .findActiveByRoleNames(List.of(
                         RoleConstants.CONSULTANT_RAW,
-                        RoleConstants.COLLABORATOR_RAW)) // thêm _RAW
+                        RoleConstants.COLLABORATOR_RAW))
                 .stream()
                 .map(SimpleUserResponse::from)
                 .toList();
@@ -61,10 +60,11 @@ public class UserService {
 
     // Create
     public UserResponse create(CreateUserRequest req) {
-        if (userRepository.existsByUsernameAndDeletedAtIsNull(req.getUsername()))
+        // ĐÃ SỬA: Gọi hàm kiểm tra quét toàn bộ Database
+        if (userRepository.existsByUsername(req.getUsername()))
             throw new AppException(ErrorCode.USERNAME_EXISTED);
 
-        if (userRepository.existsByEmailAndDeletedAtIsNull(req.getEmail()))
+        if (userRepository.existsByEmail(req.getEmail()))
             throw new AppException(ErrorCode.EMAIL_EXISTED);
 
         Role role = roleRepository.findById(req.getRoleId())
@@ -93,10 +93,10 @@ public class UserService {
         User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        // Kiểm tra email trùng với user khác
+        // ĐÃ SỬA: Gọi hàm kiểm tra quét toàn bộ Database khi đổi Email
         if (StringUtils.hasText(req.getEmail())
                 && !req.getEmail().equals(user.getEmail())
-                && userRepository.existsByEmailAndDeletedAtIsNull(req.getEmail()))
+                && userRepository.existsByEmail(req.getEmail()))
             throw new AppException(ErrorCode.EMAIL_EXISTED);
 
         if (StringUtils.hasText(req.getFullName()))

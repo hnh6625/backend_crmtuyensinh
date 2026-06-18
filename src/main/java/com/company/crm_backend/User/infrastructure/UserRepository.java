@@ -7,8 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param; // sửa
-
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,8 +21,9 @@ public interface UserRepository
     Optional<User> findByEmailAndDeletedAtIsNull(String email);
     Optional<User> findByUserIdAndDeletedAtIsNull(Long userId);
 
-    boolean existsByUsernameAndDeletedAtIsNull(String username);
-    boolean existsByEmailAndDeletedAtIsNull(String email);
+    // ĐÃ SỬA: Đổi tên hàm để quét toàn bộ DB thay vì chỉ quét user chưa xóa
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 
     // Lấy danh sách theo role
     Page<User> findAllByRole_RoleNameAndDeletedAtIsNull(
@@ -58,4 +58,3 @@ public interface UserRepository
     @Query("SELECT u FROM User u WHERE u.deletedAt IS NULL AND u.status = 'ACTIVE'")
     List<User> findAllActiveUsers();
 }
-

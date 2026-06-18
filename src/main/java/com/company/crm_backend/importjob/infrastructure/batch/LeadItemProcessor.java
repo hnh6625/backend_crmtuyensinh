@@ -17,7 +17,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-// Validate + check duplicate cho từng row CSV
 @Component
 @StepScope
 @RequiredArgsConstructor
@@ -37,43 +36,46 @@ public class LeadItemProcessor implements ItemProcessor<LeadRowDto, Lead> {
     public Lead process(LeadRowDto row) throws Exception {
         List<String> errors = new ArrayList<>();
 
-        // Validate họ tên
-        if (!StringUtils.hasText(row.getFullName()))
+        // 1. Validate họ tên
+        if (!StringUtils.hasText(row.getFullName())) {
             errors.add("Họ tên không được trống");
+        }
 
-        // Validate SĐT
-        String phone = StringUtils.hasText(row.getPhone())
-                ? row.getPhone().trim().replaceAll("\\s+", "") : "";
+        // 2. CHUẨN HOÁ SĐT (Fix lỗi Excel mất số 0, dấu nháy đơn, khoảng trắng)
+        String normalizedPhone = normalizePhone(row.getPhone());
 
-        if (phone.isEmpty())
+        // Validate SĐT sau khi đã được làm sạch
+        if (normalizedPhone == null || normalizedPhone.isEmpty()) {
             errors.add("Số điện thoại không được trống");
-        else if (!phone.matches("^(0|\\+84)[0-9]{8,10}$"))
-            errors.add("SĐT sai định dạng: " + phone);
+        } else if (!normalizedPhone.matches("^0[35789][0-9]{8}$")) { // Bắt buộc 10 số, đầu 03,05,07,08,09
+            errors.add("SĐT sai định dạng: " + row.getPhone());
+        }
 
-        // Validate email
+        // 3. Validate email
         if (StringUtils.hasText(row.getEmail())
-                && !row.getEmail().matches(
-                "^[\\w._%+\\-]+@[\\w.\\-]+\\.[a-zA-Z]{2,}$"))
+                && !row.getEmail().matches("^[\\w._%+\\-]+@[\\w.\\-]+\\.[a-zA-Z]{2,}$")) {
             errors.add("Email sai định dạng: " + row.getEmail());
+        }
 
-        // Nếu có lỗi → throw để skip row =
-        if (!errors.isEmpty())
+        // Nếu có lỗi → throw để bỏ qua dòng này và ghi vào bảng Lỗi
+        if (!errors.isEmpty()) {
             throw new ImportValidationException(String.join("; ", errors));
+        }
 
-        // Kiểm tra trùng SĐT bằng Set trong RAM
-        String normalized = normalizePhone(phone);
-        if (existingPhones.contains(normalized))
-            throw new ImportValidationException("SĐT trùng: " + phone);
+        // 4. Kiểm tra trùng SĐT bằng Set trong RAM (Tốc độ ánh sáng)
+        if (existingPhones.contains(normalizedPhone)) {
+            throw new ImportValidationException("SĐT trùng: " + normalizedPhone);
+        }
 
-        existingPhones.add(normalized);   // thêm để check trong cùng file
+        // Ghi SĐT mới vào RAM để kiểm tra các dòng tiếp theo trong cùng 1 file Excel
+        existingPhones.add(normalizedPhone);
 
-        // Map sang Entity
+        // 5. Map sang Entity
         Lead lead = new Lead();
         lead.setFullName(row.getFullName().trim());
-        lead.setPhone(phone);
-        lead.setPhoneNormalized(normalized);
-        lead.setEmail(StringUtils.hasText(row.getEmail())
-                ? row.getEmail().trim() : null);
+        lead.setPhone(normalizedPhone);           // Lưu số đã làm sạch (VD: 0902501039)
+        lead.setPhoneNormalized(normalizedPhone);
+        lead.setEmail(StringUtils.hasText(row.getEmail()) ? row.getEmail().trim() : null);
         lead.setSchoolName(row.getSchoolName());
         lead.setProvince(row.getProvince());
         lead.setAddress(row.getAddress());
@@ -81,23 +83,27 @@ public class LeadItemProcessor implements ItemProcessor<LeadRowDto, Lead> {
 
         // Gender
         if (StringUtils.hasText(row.getGender())) {
-            try { lead.setGender(Gender.valueOf(row.getGender().toUpperCase())); }
-            catch (Exception ignored) {}
+            try {
+                lead.setGender(Gender.valueOf(row.getGender().toUpperCase()));
+            } catch (Exception ignored) {}
         }
 
-        // Ngày sinh
+        // Ngày sinh (Nâng cấp: Xử lý cả 2 định dạng của Excel)
         if (StringUtils.hasText(row.getBirthDate())) {
+            String bd = row.getBirthDate().trim();
             try {
-                lead.setBirthDate(LocalDate.parse(
-                        row.getBirthDate().trim(),
-                        DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                if (bd.contains("-")) {
+                    lead.setBirthDate(LocalDate.parse(bd, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                } else {
+                    lead.setBirthDate(LocalDate.parse(bd, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                }
             } catch (Exception ignored) {}
         }
 
         // Năm tốt nghiệp
         if (StringUtils.hasText(row.getGraduationYear())) {
-            try { lead.setGraduationYear(
-                    Integer.parseInt(row.getGraduationYear().trim()));
+            try {
+                lead.setGraduationYear(Integer.parseInt(row.getGraduationYear().trim()));
             } catch (Exception ignored) {}
         }
 
@@ -112,7 +118,24 @@ public class LeadItemProcessor implements ItemProcessor<LeadRowDto, Lead> {
         return lead;
     }
 
+    // HÀM BỌC LÓT DỮ LIỆU SĐT
     private String normalizePhone(String phone) {
-        return phone.startsWith("+84") ? "0" + phone.substring(3) : phone;
+        if (phone == null || phone.trim().isEmpty()) return null;
+
+        // Xóa toàn bộ khoảng trắng, dấu nháy đơn, ký tự lạ
+        String p = phone.trim().replaceAll("[^0-9+]", "");
+
+        // Xử lý các tiền tố quốc tế
+        if (p.startsWith("+84")) {
+            p = "0" + p.substring(3);
+        } else if (p.startsWith("84") && p.length() == 11) {
+            p = "0" + p.substring(2);
+        }
+        // Đắp lại số 0 bị mất trong Excel
+        else if (p.length() == 9 && p.matches("^[35789]\\d{8}$")) {
+            p = "0" + p;
+        }
+
+        return p;
     }
 }
