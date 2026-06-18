@@ -28,6 +28,7 @@ public interface EnrollmentRepository
             SELECT e FROM Enrollment e
             JOIN FETCH e.lead l
             JOIN FETCH e.major m
+            LEFT JOIN FETCH m.department d 
             LEFT JOIN FETCH e.enrolledBy u
             WHERE e.enrollmentId = :id
             """)

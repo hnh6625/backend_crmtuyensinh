@@ -55,8 +55,9 @@ public class LeadService {
     @Transactional(readOnly = true)
     public Page<LeadResponse> getList(LeadFilterRequest filter, Pageable pageable, Long userId, String userRole) {
         // Nếu là CONSULTANT hoặc COLLABORATOR → chỉ xem lead của mình
-        if ("CONSULTANT".equals(userRole) || "COLLABORATOR".equals(userRole)) { // thêm
-            filter.setConsultantId(userId); }
+        if ("CONSULTANT".equals(userRole) || "COLLABORATOR".equals(userRole)) {
+            filter.setConsultantId(userId);
+        }
         return leadRepository.findAll(LeadSpecification.build(filter), pageable).map(lead -> {
             // Query thêm danh sách tags cho từng lead trong danh sách
             List<String> tags = leadTagMapRepository.findAllByLead_LeadId(lead.getLeadId()).stream().map(m -> m.getTag().getTagName()).toList();
@@ -86,6 +87,10 @@ public class LeadService {
         LeadStatus status = getStatusById(req.getStatusId());
         User assignedTo = getUserById(req.getAssignedTo());
 
+        if (status != null && (status.getStatusName().equalsIgnoreCase("Đã đăng ký"))) {
+            throw new RuntimeException("Không được phép tự chọn trạng thái Đã đăng ký/Đã nhập học. Vui lòng tạo hồ sơ và dùng chức năng Chốt nhập học!");
+        }
+
         Lead lead = Lead.builder()
                 .fullName(req.getFullName().trim())
                 .phone(req.getPhone().trim())
@@ -106,7 +111,6 @@ public class LeadService {
         leadRepository.save(lead);
 
         // Gắn tags nếu có
-
         if (req.getTags() != null && !req.getTags().isEmpty()) {
             saveTags(lead, req.getTags());
         }
@@ -140,7 +144,17 @@ public class LeadService {
         if (req.getSourceId() != null) lead.setSource(getSourceById(req.getSourceId()));
 
         if (req.getStatusId() != null) {
-            LeadStatus newStatus = leadStatusRepository.findById(req.getStatusId()).orElseThrow(() -> new AppException(ErrorCode.LEAD_STATUS_NOT_FOUND));
+            LeadStatus newStatus = leadStatusRepository.findById(req.getStatusId())
+                    .orElseThrow(() -> new AppException(ErrorCode.LEAD_STATUS_NOT_FOUND));
+
+            if (newStatus.getStatusName().equalsIgnoreCase("Đã đăng ký")) {
+
+                // Nếu trạng thái CŨ không phải là Đã đăng ký mà cố chuyển sang -> Báo lỗi!
+                if (lead.getStatus() == null || !lead.getStatus().getStatusId().equals(newStatus.getStatusId())) {
+                    throw new RuntimeException("Không được phép chuyển sang Đã đăng ký/Đã nhập học bằng tay. Vui lòng dùng chức năng Chốt nhập học!");
+                }
+            }
+
             lead.setStatus(newStatus);
             historyService.record(leadId, "STATUS_CHANGE", oldStatus, newStatus.getStatusName(), changedBy);
         }

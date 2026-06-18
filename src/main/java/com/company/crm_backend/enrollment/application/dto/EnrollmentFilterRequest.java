@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 public class EnrollmentFilterRequest {
     private String keyword;
+    private Long departmentId;
     private Long majorId;
     private EnrollmentStatus status;
 }

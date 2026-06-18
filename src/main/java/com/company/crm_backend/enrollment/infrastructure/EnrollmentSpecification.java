@@ -21,6 +21,10 @@ public class EnrollmentSpecification {
                 predicates.add(cb.or(matchName, matchPhone));
             }
 
+            if (filter.getDepartmentId() != null) {
+                predicates.add(cb.equal(root.join("major").join("department").get("departmentId"), filter.getDepartmentId()));
+            }
+
             if (filter.getMajorId() != null) {
                 predicates.add(cb.equal(root.join("major").get("majorId"), filter.getMajorId()));
             }
