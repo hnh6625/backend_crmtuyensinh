@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -182,5 +183,16 @@ public class CallService {
 
         schedule.setStatus(newStatus);
         return FollowUpResponse.from(followUpRepository.save(schedule));
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0/30 * * * *")
+    public void autoCancelOverdueFollowUps() {
+        LocalDateTime now = LocalDateTime.now();
+        int updateCount = followUpRepository.cancelOverdueFollowUps(now);
+
+        if (updateCount > 0) {
+            log.info("Cron JOB: Đã tự động hủy lịch hẹn quá hạn vào lúc {}", updateCount,now);
+        }
     }
 }

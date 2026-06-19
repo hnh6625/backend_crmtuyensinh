@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface FollowUpRepository extends JpaRepository<FollowUpSchedule, Long> {
 
-    // ── Lịch hẹn PENDING của consultant — sắp đến trước
+    // Lịch hẹn PENDING của consultant — sắp đến trước
     List<FollowUpSchedule> findAllByConsultant_UserIdAndStatusOrderByScheduledAtAsc(
             Long consultantId, FollowUpStatus status);
 
@@ -42,4 +42,9 @@ public interface FollowUpRepository extends JpaRepository<FollowUpSchedule, Long
             WHERE f.lead.leadId = :leadId AND f.status = 'PENDING'
             """)
     void cancelAllPendingByLeadId(@Param("leadId") Long leadId);
+
+    // Cập nhật cancel những lịch hẹn đang pending mà thời gian nhỏ hơn thời gian hiện tại
+    @Modifying
+    @Query("UPDATE FollowUpSchedule f SET f.status = 'CANCELLED' WHERE f.status = 'PENDING' AND f.scheduledAt < :now")
+    int cancelOverdueFollowUps(@Param("now") LocalDateTime now);
 }
